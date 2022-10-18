@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/platform/trunk/src/Core/System/SystemConfig/Schema/config.xsd">
+    <card>
+        <title>Activation</title>
+        <input-field type="bool">
+            <name>frActivation</name>
+            <label>Enable/Disable the Module</label>
+            <defaultValue>true</defaultValue>
+        </input-field>
+    </card>
+
+    <card>
+        <title>Token</title>
+        <input-field type="text">
+            <name>frToken</name>
+            <label>Filerobot token from your Filerobot account</label>
+            <placeholder>abcdefgh</placeholder>
+        </input-field>
+    </card>
+
+    <card>
+        <title>CNAME</title>
+        <input-field type="text">
+            <name>frCNAME</name>
+            <label>Enter the cname as per configuration done in your Filerobot Asset Hub interface, once validated and SSL certificate accepted. (Or leave blank if none)</label>
+            <placeholder>abcdefgh</placeholder>
+        </input-field>
+    </card>
+
+    <card>
+        <title>Security Template Identifier</title>
+        <input-field type="text">
+            <name>frSEC</name>
+            <label>To load the Filerobot Widget or Filerobot Image Editor, you you need to create a Security Template in your Filerobot Asset Hub first, in order for your WordPress instantiation of the Filerobot Widget to obtain proper credentials and access your storage</label>
+            <placeholder>SECU_3268740A1382466B9XBC390D8</placeholder>
+        </input-field>
+    </card>
+
+    <card>
+        <title>Filerobot upload directory</title>
+        <input-field type="text">
+            <name>frUploadDirectory</name>
+            <label>The directory in your Filerobot account, where the files will be stored</label>
+            <placeholder>/wp_assets</placeholder>
+            <defaultValue>/wp_assets</defaultValue>
+        </input-field>
+    </card>
+</config>
