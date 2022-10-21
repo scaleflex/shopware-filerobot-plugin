@@ -23,8 +23,8 @@
         <title>CNAME</title>
         <input-field type="text">
             <name>frCNAME</name>
-            <label>Enter the cname as per configuration done in your Filerobot Asset Hub interface, once validated and SSL certificate accepted. (Or leave blank if none)</label>
-            <placeholder>abcdefgh</placeholder>
+            <label>Enter the CNAME as per configuration done in your Filerobot Asset Hub interface, once validated and SSL certificate accepted. (Or leave blank if none)</label>
+            <placeholder>media.mydomain.com</placeholder>
         </input-field>
     </card>
 

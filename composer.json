@@ -14,6 +14,10 @@
     "label": {
       "de-DE": "Filerobot - Digital Asset Management, Media Optimisation and Acceleration",
       "en-GB": "Filerobot - Digital Asset Management, Media Optimisation and Acceleration"
+    },
+    "description": {
+      "de-DE": "Filerobot by Scaleflex normalizes, resizes, optimizes and distributes your images rocket fast around the world.",
+      "en-GB": "Filerobot by Scaleflex normalizes, resizes, optimizes and distributes your images rocket fast around the world."
     }
   }
 }
