@@ -35,8 +35,11 @@ class Filerobot extends Plugin
             return;
         }
 
+        /**
+         * Delete all related data
+         */
         $connection = \Shopware\Core\Kernel::getConnection();
-        $query = $connection->executeStatement("SELECT *
+        $query = $connection->executeQuery("SELECT *
                     FROM media 
                     WHERE is_filerobot = 1");
         $media = $query->fetchAllAssociative();
@@ -47,7 +50,7 @@ class Filerobot extends Plugin
             $connection->executeStatement('DELETE FROM `media_translation` where media_id = "' . $media_id . '"');
         }
         $connection->executeStatement('DELETE FROM `media` where is_filerobot = 1');
-        $connection->executeStatement("ALTER TABLE `shopware`.`media` 
+        $connection->executeStatement("ALTER TABLE `media` 
         DROP COLUMN `is_filerobot`,
         DROP COLUMN `url`;");
     }
@@ -62,9 +65,22 @@ class Filerobot extends Plugin
         $config->set('Filerobot.config.frActivation', true);
         $config->set('Filerobot.config.frUploadDirectory', "/wp_assets");
 
+        /**
+         * Add more field url, is_filerobot
+         */
         $connection = \Shopware\Core\Kernel::getConnection();
-        $connection->executeStatement("ALTER TABLE `media` 
-        ADD COLUMN `url` VARCHAR(255) NULL AFTER `updated_at`,
-        ADD COLUMN `is_filerobot` TINYINT(1) NULL AFTER `url`;");
+        $query = $connection->executeQuery("SHOW COLUMNS FROM `media` LIKE 'url'");
+        $result = $query->fetchAllAssociative();
+        if (count($result) == 0) {
+            $connection->executeStatement("ALTER TABLE `media` 
+            ADD COLUMN `url` VARCHAR(255) NULL AFTER `updated_at`;");
+        }
+
+        $query = $connection->executeQuery("SHOW COLUMNS FROM `media` LIKE 'is_filerobot'");
+        $result = $query->fetchAllAssociative();
+        if (count($result) == 0) {
+            $connection->executeStatement("ALTER TABLE `media` 
+            ADD COLUMN `is_filerobot` TINYINT(1) NULL AFTER `url`;");
+        }
     }
 }

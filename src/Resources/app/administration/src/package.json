@@ -1,0 +1,8 @@
+{
+  "name": "filerobot",
+  "version": "1.0.0",
+  "description": "Filerobot by Scaleflex normalizes, resizes, optimizes and distributes your images rocket fast around the world.",
+  "main": "main.js",
+  "author": "Scaleflex",
+  "license": "MIT"
+}
