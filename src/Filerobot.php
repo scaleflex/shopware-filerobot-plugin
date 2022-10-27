@@ -6,18 +6,9 @@ use Shopware\Core\Framework\Plugin;
 use Shopware\Core\Framework\Plugin\Context\InstallContext;
 use Shopware\Core\Framework\Plugin\Context\ActivateContext;
 use Shopware\Core\Framework\Plugin\Context\UninstallContext;
-use Shopware\Core\System\SystemConfig\SystemConfigService;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use CloudImage\Component\DependencyInjection\CustomProfilerExtensions;
 
 class Filerobot extends Plugin
 {
-    public function build(ContainerBuilder $container): void
-    {
-        $container->addCompilerPass(new CustomProfilerExtensions());
-        parent::build($container);
-    }
-
     public function install(InstallContext $installContext): void
     {
         parent::install($installContext);
