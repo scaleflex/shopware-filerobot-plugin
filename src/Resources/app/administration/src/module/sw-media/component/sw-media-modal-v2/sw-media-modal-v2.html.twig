@@ -1,3 +1,9 @@
 {% block sw_media_modal_v2_tab_items %}
-    a
+    {% parent %}
+    <sw-tabs-item
+            :name="tabFilerobotDAM"
+            :active-tab="active"
+    >
+        Filerobot DAM
+    </sw-tabs-item>
 {% endblock %}

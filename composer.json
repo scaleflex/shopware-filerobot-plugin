@@ -1,16 +1,30 @@
 {
-  "name": "swag/plugin-skeleton",
+  "name": "scaleflex/shopware-filerobot-plugin",
+  "keywords": ["scaleflex", "shopware-6", "filerobot", "cdn", "image optimization"],
   "description": "Filerobot by Scaleflex normalizes, resizes, optimizes and distributes your images rocket fast around the world.",
   "type": "shopware-platform-plugin",
-  "license": "MIT",
+  "version": "1.0.0",
+  "license": "proprietary",
   "autoload": {
     "psr-4": {
-      "Filerobot\\": "src/"
+      "Scaleflex\\Filerobot\\": "src/"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "Scaleflex\\Filerobot\\Test\\": "test/"
+    }
+  },
+  "require": {
+    "shopware/core": "6.*"
+  },
+  "authors": [
+    {
+      "name": "Scaleflex"
+    }
+  ],
   "extra": {
-    "shopware-plugin-class": "Filerobot\\Filerobot",
-    "author": "Scaleflex",
+    "shopware-plugin-class": "Scaleflex\\Filerobot\\ScaleflexFilerobot",
     "label": {
       "de-DE": "Filerobot - Digital Asset Management, Media Optimisation and Acceleration",
       "en-GB": "Filerobot - Digital Asset Management, Media Optimisation and Acceleration"
@@ -18,6 +32,10 @@
     "description": {
       "de-DE": "Filerobot by Scaleflex normalizes, resizes, optimizes and distributes your images rocket fast around the world.",
       "en-GB": "Filerobot by Scaleflex normalizes, resizes, optimizes and distributes your images rocket fast around the world."
+    },
+    "manufacturerLink": {
+      "de-DE": "https://scaleflex.com",
+      "en-GB": "https://scaleflex.com"
     }
   }
 }

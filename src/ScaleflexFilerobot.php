@@ -1,13 +1,13 @@
 <?php declare(strict_types=1);
 
-namespace Filerobot;
+namespace Scaleflex\Filerobot;
 
 use Shopware\Core\Framework\Plugin;
 use Shopware\Core\Framework\Plugin\Context\InstallContext;
 use Shopware\Core\Framework\Plugin\Context\ActivateContext;
 use Shopware\Core\Framework\Plugin\Context\UninstallContext;
 
-class Filerobot extends Plugin
+class ScaleflexFilerobot extends Plugin
 {
     public function install(InstallContext $installContext): void
     {
