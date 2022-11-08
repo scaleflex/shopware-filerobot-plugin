@@ -3,45 +3,55 @@
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/platform/trunk/src/Core/System/SystemConfig/Schema/config.xsd">
     <card>
         <title>Activation</title>
+        <title lang="de-DE">Activation</title>
         <input-field type="bool">
             <name>frActivation</name>
             <label>Enable/Disable the Module</label>
+            <label lang="de-DE">Enable/Disable the Module</label>
             <defaultValue>true</defaultValue>
         </input-field>
     </card>
 
     <card>
         <title>Token</title>
+        <title lang="de-DE">Token</title>
         <input-field type="text">
             <name>frToken</name>
             <label>Filerobot token from your Filerobot account</label>
+            <label lang="de-DE">Filerobot token from your Filerobot account</label>
             <placeholder>abcdefgh</placeholder>
         </input-field>
     </card>
 
     <card>
         <title>CNAME</title>
+        <title lang="de-DE">CNAME</title>
         <input-field type="text">
             <name>frCNAME</name>
             <label>Enter the CNAME as per configuration done in your Filerobot Asset Hub interface, once validated and SSL certificate accepted. (Or leave blank if none)</label>
+            <label lang="de-DE">Enter the CNAME as per configuration done in your Filerobot Asset Hub interface, once validated and SSL certificate accepted. (Or leave blank if none)</label>
             <placeholder>media.mydomain.com</placeholder>
         </input-field>
     </card>
 
     <card>
         <title>Security Template Identifier</title>
+        <title lang="de-DE">Security Template Identifier</title>
         <input-field type="text">
             <name>frSEC</name>
             <label>To load the Filerobot Widget or Filerobot Image Editor, you you need to create a Security Template in your Filerobot Asset Hub first, in order for your WordPress instantiation of the Filerobot Widget to obtain proper credentials and access your storage</label>
+            <label lang="de-DE">To load the Filerobot Widget or Filerobot Image Editor, you you need to create a Security Template in your Filerobot Asset Hub first, in order for your WordPress instantiation of the Filerobot Widget to obtain proper credentials and access your storage</label>
             <placeholder>SECU_3268740A1382466B9XBC390D8</placeholder>
         </input-field>
     </card>
 
     <card>
         <title>Filerobot upload directory</title>
+        <title lang="de-DE">Filerobot upload directory</title>
         <input-field type="text">
             <name>frUploadDirectory</name>
             <label>The directory in your Filerobot account, where the files will be stored</label>
+            <label lang="de-DE">The directory in your Filerobot account, where the files will be stored</label>
             <placeholder>/wp_assets</placeholder>
             <defaultValue>/wp_assets</defaultValue>
         </input-field>

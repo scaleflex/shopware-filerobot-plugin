@@ -7,3 +7,10 @@
         Filerobot DAM
     </sw-tabs-item>
 {% endblock %}
+
+{% block sw_media_modal_v2_tab_content_library %}
+    {% parent %}
+    <template v-if="active === tabFilerobotDAM">
+        <sw-filerobot-library ref="filerobotLibrary"/>
+    </template>
+{% endblock %}

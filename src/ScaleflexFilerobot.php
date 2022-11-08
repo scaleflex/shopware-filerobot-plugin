@@ -16,8 +16,8 @@ class ScaleflexFilerobot extends Plugin
         $config = $this->container->get('Shopware\Core\System\SystemConfig\SystemConfigService');
 
         //set the specified values as defaults
-        $config->set('Filerobot.config.frActivation', true);
-        $config->set('Filerobot.config.frUploadDirectory', "/wp_assets");
+        $config->set('ScaleflexFilerobot.config.frActivation', true);
+        $config->set('ScaleflexFilerobot.config.frUploadDirectory', "/wp_assets");
     }
 
     public function uninstall(UninstallContext $uninstallContext): void
@@ -49,12 +49,6 @@ class ScaleflexFilerobot extends Plugin
     public function activate(ActivateContext $activateContext): void
     {
         parent::activate($activateContext);
-
-        $config = $this->container->get('Shopware\Core\System\SystemConfig\SystemConfigService');
-
-        //set the specified values as defaults
-        $config->set('Filerobot.config.frActivation', true);
-        $config->set('Filerobot.config.frUploadDirectory', "/wp_assets");
 
         /**
          * Add more field url, is_filerobot
