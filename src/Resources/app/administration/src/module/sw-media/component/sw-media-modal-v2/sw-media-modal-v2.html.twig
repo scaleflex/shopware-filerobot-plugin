@@ -11,6 +11,9 @@
 {% block sw_media_modal_v2_tab_content_library %}
     {% parent %}
     <template v-if="active === tabFilerobotDAM">
-        <sw-filerobot-library ref="filerobotLibrary"/>
+        <sw-filerobot-library
+                ref="filerobotLibrary"
+                @media-selection-change="selection = $event"
+        />
     </template>
 {% endblock %}
