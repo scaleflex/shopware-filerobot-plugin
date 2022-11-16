@@ -13,7 +13,7 @@
     <template v-if="active === tabFilerobotDAM">
         <sw-filerobot-library
                 ref="filerobotLibrary"
-                @media-selection-change="selection = $event"
-        />
+                :selection="selection"
+                @media-selection-change="selection = $event"/>
     </template>
 {% endblock %}

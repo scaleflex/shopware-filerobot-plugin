@@ -1,10 +1,15 @@
 import template from './sw-filerobot-library.html.twig';
 
-const { Component } = Shopware;
+const { Component, Context } = Shopware;
 
 Component.register('sw-filerobot-library', {
     template,
-    inject: ['systemConfigApiService'],
+    inject: ['systemConfigApiService', 'repositoryFactory'],
+
+    model: {
+        prop: 'selection',
+        event: 'media-selection-change',
+    },
 
     props: {
         frActivation: {
@@ -39,7 +44,7 @@ Component.register('sw-filerobot-library', {
 
         selection: {
             type: Array,
-            required: false,
+            required: true,
         },
 
     },
@@ -56,7 +61,9 @@ Component.register('sw-filerobot-library', {
     },
 
     computed: {
-
+        mediaRepository() {
+            return this.repositoryFactory.create('media');
+        },
     },
 
     watch: {
@@ -154,16 +161,24 @@ Component.register('sw-filerobot-library', {
                         },
                     })
                     .use(XHRUpload)
-                    .on('export', (files, popupExportSucessMsgFn, downloadFilesPackagedFn, downloadFileFn) => {
-                        console.log('export');
+                    .on('export', async (files, popupExportSucessMsgFn, downloadFilesPackagedFn, downloadFileFn) => {
                         console.dir(files);
                         var to_insert = [];
 
                         files.forEach((selected, key) => {
                             to_insert.push(selected.file.uuid);
                         });
-                        this.selectedItems = to_insert;
-                        console.log(this.selectedItems);
+
+                        //step 1: create media form filerobot
+                        // Resources/app/administration/src/app/component/media/sw-media-upload-v2/index.js line 382 example
+
+                        //step 2: get media insert
+                        // let media = await this.mediaRepository.get('70e352200b5c45098dc65a5b47094a2a', Context.api);
+
+                        //step 3: add media to this.selectedItems
+
+                        //step 4: add media to product media
+                        // -> need to try this function -> this.$emit('media-selection-change', this.selectedItems);
 
                         if (to_insert.length === 0) {
                             return;
