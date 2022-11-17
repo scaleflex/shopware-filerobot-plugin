@@ -1,15 +1,22 @@
 import template from './sw-filerobot-library.html.twig';
 
-const { Component, Context } = Shopware;
+const { Component, Mixin, Context } = Shopware;
+const { fileReader } = Shopware.Utils;
+const INPUT_TYPE_FILE_UPLOAD = 'file-upload';
+const INPUT_TYPE_URL_UPLOAD = 'url-upload';
 
 Component.register('sw-filerobot-library', {
     template,
-    inject: ['systemConfigApiService', 'repositoryFactory'],
+    inject: ['systemConfigApiService', 'repositoryFactory', 'mediaService'],
 
     model: {
         prop: 'selection',
         event: 'media-selection-change',
     },
+
+    mixins: [
+        Mixin.getByName('notification'),
+    ],
 
     props: {
         frActivation: {
@@ -75,6 +82,10 @@ Component.register('sw-filerobot-library', {
     },
 
     methods: {
+        useFileUpload() {
+            this.inputType = INPUT_TYPE_FILE_UPLOAD;
+        },
+
         async validToken()
         {
             const frConfig = await this.systemConfigApiService.getValues('ScaleflexFilerobot.config');
@@ -163,21 +174,26 @@ Component.register('sw-filerobot-library', {
                     .use(XHRUpload)
                     .on('export', async (files, popupExportSucessMsgFn, downloadFilesPackagedFn, downloadFileFn) => {
                         console.dir(files);
-                        var to_insert = [];
 
-                        files.forEach((selected, key) => {
+                        let to_insert = [];
+
+                        //step 1: create media from filerobot url
+                        // Resources/app/administration/src/app/component/media/sw-media-upload-v2/index.js line 382 example
+                        files.forEach(async (selected, key) => {
                             to_insert.push(selected.file.uuid);
+                            let url = new URL(selected.link);
+                            let fileExtension = selected.file.extension;
+                            await this.onUrlUpload({url, fileExtension});
                         });
 
-                        //step 1: create media form filerobot
-                        // Resources/app/administration/src/app/component/media/sw-media-upload-v2/index.js line 382 example
+                        //step 2: write api delete local file just added and update media field `url`, `is_filerobot`
 
-                        //step 2: get media insert
+                        //step 3: get media by id
                         // let media = await this.mediaRepository.get('70e352200b5c45098dc65a5b47094a2a', Context.api);
 
-                        //step 3: add media to this.selectedItems
+                        //step 4: add media to this.selectedItems
 
-                        //step 4: add media to product media
+                        //step 5: add media to product media
                         // -> need to try this function -> this.$emit('media-selection-change', this.selectedItems);
 
                         if (to_insert.length === 0) {
@@ -208,6 +224,40 @@ Component.register('sw-filerobot-library', {
             }  else {
                 console.log('Filerobot is unauthorized.');
             }
-        }
+        },
+
+        getMediaEntityForUpload() {
+            let mediaItem = this.mediaRepository.create();
+            mediaItem.mediaFolderId = null;
+            return mediaItem;
+        },
+
+        async onUrlUpload({ url, fileExtension }) {
+            let fileInfo;
+            try {
+                fileInfo = fileReader.getNameAndExtensionFromUrl(url);
+            } catch {
+                this.createNotificationError({
+                    title: this.$tc('global.default.error'),
+                    message: this.$tc('global.sw-media-upload-v2.notification.invalidUrl.message'),
+                });
+
+                return;
+            }
+
+            if (fileExtension) {
+                fileInfo.extension = fileExtension;
+            }
+
+            console.log(fileInfo);
+
+            const targetEntity = this.getMediaEntityForUpload();
+            console.log(targetEntity);
+            await this.mediaRepository.save(targetEntity, Context.api);
+            let result = this.mediaService.addUpload('upload-tag-sw-media-index', { src: url, targetId: targetEntity.id, ...fileInfo });
+            console.log(result);
+
+            this.useFileUpload();
+        },
     },
 });
