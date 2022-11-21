@@ -54,6 +54,16 @@ Component.register('sw-filerobot-library', {
             required: true,
         },
 
+        uploadTag: {
+            type: String,
+            required: true,
+        },
+
+        disabled: {
+            type: Boolean,
+            required: false,
+            default: false,
+        },
     },
     data() {
         return {
@@ -71,6 +81,10 @@ Component.register('sw-filerobot-library', {
         mediaRepository() {
             return this.repositoryFactory.create('media');
         },
+
+        isUrlUpload() {
+            return this.inputType === INPUT_TYPE_URL_UPLOAD;
+        },
     },
 
     watch: {
@@ -79,6 +93,10 @@ Component.register('sw-filerobot-library', {
 
     created() {
         this.createdComponent();
+    },
+
+    beforeDestroy() {
+        this.beforeDestroyComponent();
     },
 
     methods: {
@@ -134,6 +152,9 @@ Component.register('sw-filerobot-library', {
 
         async createdComponent() {
             if (await this.validToken()) {
+                console.log(this.uploadTag);
+                this.mediaService.addListener(this.uploadTag, this.handleMediaServiceUploadEvent);
+
                 let current_url = window.location.href;
                 let swMediaSidebarElement = document.getElementsByClassName("sw-media-sidebar no-headline");
                 swMediaSidebarElement[0].style.display = 'none';
@@ -172,13 +193,14 @@ Component.register('sw-filerobot-library', {
                         },
                     })
                     .use(XHRUpload)
-                    .on('export', async (files, popupExportSucessMsgFn, downloadFilesPackagedFn, downloadFileFn) => {
+                    .on('export', async (files, popupExportSuccessMsgFn, downloadFilesPackagedFn, downloadFileFn) => {
                         console.dir(files);
 
                         let to_insert = [];
 
                         //step 1: create media from filerobot url
-                        // Resources/app/administration/src/app/component/media/sw-media-upload-v2/index.js line 382 example
+                        // Resources/app/administration/src/app/component/media/sw-media-upload-v2/index.js line 337 example
+
                         files.forEach(async (selected, key) => {
                             to_insert.push(selected.file.uuid);
                             let url = new URL(selected.link);
@@ -188,12 +210,14 @@ Component.register('sw-filerobot-library', {
 
                         //step 2: write api delete local file just added and update media field `url`, `is_filerobot`
 
-                        //step 3: get media by id
+                        //step 3: override function get media
+
+                        //step 4: get media by id
                         // let media = await this.mediaRepository.get('70e352200b5c45098dc65a5b47094a2a', Context.api);
 
-                        //step 4: add media to this.selectedItems
+                        //step 5: add media to this.selectedItems
 
-                        //step 5: add media to product media
+                        //step 6: add media to product media
                         // -> need to try this function -> this.$emit('media-selection-change', this.selectedItems);
 
                         if (to_insert.length === 0) {
@@ -226,6 +250,11 @@ Component.register('sw-filerobot-library', {
             }
         },
 
+        beforeDestroyComponent() {
+            this.mediaService.removeByTag(this.uploadTag);
+            this.mediaService.removeListener(this.uploadTag, this.handleMediaServiceUploadEvent);
+        },
+
         getMediaEntityForUpload() {
             let mediaItem = this.mediaRepository.create();
             mediaItem.mediaFolderId = null;
@@ -249,15 +278,26 @@ Component.register('sw-filerobot-library', {
                 fileInfo.extension = fileExtension;
             }
 
-            console.log(fileInfo);
-
             const targetEntity = this.getMediaEntityForUpload();
-            console.log(targetEntity);
             await this.mediaRepository.save(targetEntity, Context.api);
-            let result = this.mediaService.addUpload('upload-tag-sw-media-index', { src: url, targetId: targetEntity.id, ...fileInfo });
-            console.log(result);
+            this.mediaService.addUpload(this.uploadTag, { src: url, filerobot: true, targetId: targetEntity.id, ...fileInfo });
 
             this.useFileUpload();
+        },
+
+        handleMediaServiceUploadEvent({ action }) {
+            if (action === 'media-upload-fail') {
+                this.onRemoveMediaItem();
+            }
+        },
+
+        onRemoveMediaItem() {
+            if (this.disabled) {
+                return;
+            }
+
+            this.preview = null;
+            this.$emit('media-upload-remove-image');
         },
     },
 });
