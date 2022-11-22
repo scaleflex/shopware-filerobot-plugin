@@ -152,7 +152,6 @@ Component.register('sw-filerobot-library', {
 
         async createdComponent() {
             if (await this.validToken()) {
-                console.log(this.uploadTag);
                 this.mediaService.addListener(this.uploadTag, this.handleMediaServiceUploadEvent);
 
                 let current_url = window.location.href;
@@ -243,8 +242,6 @@ Component.register('sw-filerobot-library', {
                 setTimeout(function () {
                     window.history.pushState(null, document.title, current_url);
                 }, 1000);
-
-                console.log('Filerobot is ready');
             }  else {
                 console.log('Filerobot is unauthorized.');
             }
@@ -281,7 +278,6 @@ Component.register('sw-filerobot-library', {
             const targetEntity = this.getMediaEntityForUpload();
             await this.mediaRepository.save(targetEntity, Context.api);
             this.mediaService.addUpload(this.uploadTag, { src: url, filerobot: true, targetId: targetEntity.id, ...fileInfo });
-
             this.useFileUpload();
         },
 
