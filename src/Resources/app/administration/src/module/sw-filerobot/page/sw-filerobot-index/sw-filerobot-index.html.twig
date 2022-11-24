@@ -1,0 +1,12 @@
+<!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+{% block sw_filerobot_index %}
+    <sw-page class="sw-filerobot-index">
+        {% block sw_filerobot_index_page_content %}
+            <template slot="content">
+                <div class="sw-filerobot-library" style="overflow: scroll">
+                    <div id="filerobot-widget"></div>
+                </div>
+            </template>
+        {% endblock %}
+    </sw-page>
+{% endblock %}

@@ -1,22 +1,11 @@
-import template from './sw-filerobot-library.html.twig';
+import template from './sw-filerobot-index.html.twig';
 
-const {Component, Mixin, Context} = Shopware;
-const {fileReader} = Shopware.Utils;
-const INPUT_TYPE_FILE_UPLOAD = 'file-upload';
-const INPUT_TYPE_URL_UPLOAD = 'url-upload';
+const { Component } = Shopware;
 
-Component.register('sw-filerobot-library', {
+Component.register('sw-filerobot-index', {
     template,
+
     inject: ['systemConfigApiService', 'repositoryFactory', 'mediaService'],
-
-    model: {
-        prop: 'selection',
-        event: 'media-selection-change',
-    },
-
-    mixins: [
-        Mixin.getByName('notification'),
-    ],
 
     props: {
         frActivation: {
@@ -52,23 +41,14 @@ Component.register('sw-filerobot-library', {
         selection: {
             type: Array,
             required: true,
-        },
-
-        uploadTag: {
-            type: String,
-            required: true,
-        },
-
-        disabled: {
-            type: Boolean,
-            required: false,
-            default: false,
-        },
+        }
     },
+
     data() {
         return {
-            selectedItems: this.selection,
-        }
+            isLoading: false,
+            term: this.$route.query ? this.$route.query.term : '',
+        };
     },
 
     mounted() {
@@ -77,31 +57,17 @@ Component.register('sw-filerobot-library', {
         document.head.appendChild(filerobotScript);
     },
 
-    computed: {
-        mediaRepository() {
-            return this.repositoryFactory.create('media');
-        },
-
-        isUrlUpload() {
-            return this.inputType === INPUT_TYPE_URL_UPLOAD;
-        },
+    metaInfo() {
+        return {
+            title: this.$createTitle(),
+        };
     },
-
-    watch: {},
 
     created() {
         this.createdComponent();
     },
 
-    beforeDestroy() {
-        this.beforeDestroyComponent();
-    },
-
     methods: {
-        useFileUpload() {
-            this.inputType = INPUT_TYPE_FILE_UPLOAD;
-        },
-
         async validToken() {
             const frConfig = await this.systemConfigApiService.getValues('ScaleflexFilerobot.config');
             let frActivation = frConfig['ScaleflexFilerobot.config.frActivation'];
@@ -150,10 +116,8 @@ Component.register('sw-filerobot-library', {
         async createdComponent() {
             if (await this.validToken()) {
                 this.mediaService.addListener(this.uploadTag, this.handleMediaServiceUploadEvent);
-
                 let current_url = window.location.href;
-                let swMediaSidebarElement = document.getElementsByClassName("sw-media-sidebar no-headline");
-                swMediaSidebarElement[0].style.display = 'none';
+
                 if (!Filerobot) {
                     var Filerobot = window.Filerobot;
                 }
@@ -182,6 +146,7 @@ Component.register('sw-filerobot-library', {
                         inline: true,
                         width: 10000,
                         height: 1000,
+                        disableExportButton: true,
                         locale: {
                             strings: {
                                 export: 'Insert from FMAW into page'
@@ -190,50 +155,10 @@ Component.register('sw-filerobot-library', {
                     })
                     .use(XHRUpload)
                     .on('export', async (files, popupExportSuccessMsgFn, downloadFilesPackagedFn, downloadFileFn) => {
-                        console.dir(files);
 
-                        let to_insert = [];
-
-                        //step 1: create media from filerobot url
-                        // Resources/app/administration/src/app/component/media/sw-media-upload-v2/index.js line 337 example
-
-                        files.forEach(async (selected, key) => {
-                            to_insert.push(selected.file.uuid);
-                            let url = new URL(selected.link);
-                            let fileExtension = selected.file.extension;
-                            await this.onUrlUpload({url, fileExtension});
-                        });
-
-                        //step 2: write api delete local file just added and update media field `url`, `is_filerobot`
-
-                        //step 3: override function get media
-
-                        //step 4: get media by id
-                        // let media = await this.mediaRepository.get('70e352200b5c45098dc65a5b47094a2a', Context.api);
-
-                        //step 5: add media to this.selectedItems
-
-                        //step 6: add media to product media
-                        // -> need to try this function -> this.$emit('media-selection-change', this.selectedItems);
-
-                        if (to_insert.length === 0) {
-                            return;
-                        }
                     })
                     .on('complete', ({failed, uploadID, successful}) => {
-                        if (failed) {
-                            console.dir(failed);
-                        }
 
-                        if (successful) {
-                            console.dir(successful);
-
-                            var to_insert = [];
-
-                            successful.forEach((item, key) => {
-                                to_insert.push(item.uuid);
-                            });
-                        }
                     });
 
                 setTimeout(function () {
@@ -242,59 +167,6 @@ Component.register('sw-filerobot-library', {
             } else {
                 console.log('Filerobot is unauthorized.');
             }
-        },
-
-        beforeDestroyComponent() {
-            this.mediaService.removeByTag(this.uploadTag);
-            this.mediaService.removeListener(this.uploadTag, this.handleMediaServiceUploadEvent);
-        },
-
-        getMediaEntityForUpload() {
-            let mediaItem = this.mediaRepository.create();
-            mediaItem.mediaFolderId = null;
-            return mediaItem;
-        },
-
-        async onUrlUpload({url, fileExtension}) {
-            let fileInfo;
-            try {
-                fileInfo = fileReader.getNameAndExtensionFromUrl(url);
-            } catch {
-                this.createNotificationError({
-                    title: this.$tc('global.default.error'),
-                    message: this.$tc('global.sw-media-upload-v2.notification.invalidUrl.message'),
-                });
-
-                return;
-            }
-
-            if (fileExtension) {
-                fileInfo.extension = fileExtension;
-            }
-
-            const targetEntity = this.getMediaEntityForUpload();
-            await this.mediaRepository.save(targetEntity, Context.api);
-            this.mediaService.addUpload(this.uploadTag, {
-                src: url,
-                filerobot: true,
-                targetId: targetEntity.id, ...fileInfo
-            });
-            this.useFileUpload();
-        },
-
-        handleMediaServiceUploadEvent({action}) {
-            if (action === 'media-upload-fail') {
-                this.onRemoveMediaItem();
-            }
-        },
-
-        onRemoveMediaItem() {
-            if (this.disabled) {
-                return;
-            }
-
-            this.preview = null;
-            this.$emit('media-upload-remove-image');
         },
     },
 });
