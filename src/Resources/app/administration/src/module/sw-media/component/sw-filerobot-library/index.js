@@ -204,9 +204,11 @@ Component.register('sw-filerobot-library', {
                             await this.onUrlUpload({url, fileExtension});
                         });
 
-                        //step 2: write api delete local file just added and update media field `url`, `is_filerobot`
+                        //step 2: write api delete local file just added and update media field `filerobot_url`, `is_filerobot`
 
                         //step 3: override function get media
+                        // override vendor/shopware/core/Content/Media/MediaDefinition.php
+                        // override vendor/shopware/core/Content/Media/MediaEntity.php
 
                         //step 4: get media by id
                         // let media = await this.mediaRepository.get('70e352200b5c45098dc65a5b47094a2a', Context.api);

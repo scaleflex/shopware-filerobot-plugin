@@ -43,7 +43,8 @@ class ScaleflexFilerobot extends Plugin
         $connection->executeStatement('DELETE FROM `media` where is_filerobot = 1');
         $connection->executeStatement("ALTER TABLE `media` 
         DROP COLUMN `is_filerobot`,
-        DROP COLUMN `url`;");
+        DROP COLUMN `filerobot_url`;
+        DROP COLUMN `filerobot_uuid`;");
     }
 
     public function activate(ActivateContext $activateContext): void
@@ -54,18 +55,25 @@ class ScaleflexFilerobot extends Plugin
          * Add more field url, is_filerobot
          */
         $connection = \Shopware\Core\Kernel::getConnection();
-        $query = $connection->executeQuery("SHOW COLUMNS FROM `media` LIKE 'url'");
+        $query = $connection->executeQuery("SHOW COLUMNS FROM `media` LIKE 'filerobot_url'");
         $result = $query->fetchAllAssociative();
         if (count($result) == 0) {
             $connection->executeStatement("ALTER TABLE `media` 
-            ADD COLUMN `url` VARCHAR(255) NULL AFTER `updated_at`;");
+            ADD COLUMN `filerobot_url` VARCHAR(255) NULL AFTER `updated_at`;");
         }
 
         $query = $connection->executeQuery("SHOW COLUMNS FROM `media` LIKE 'is_filerobot'");
         $result = $query->fetchAllAssociative();
         if (count($result) == 0) {
             $connection->executeStatement("ALTER TABLE `media` 
-            ADD COLUMN `is_filerobot` TINYINT(1) NULL AFTER `url`;");
+            ADD COLUMN `is_filerobot` TINYINT(1) NULL AFTER `filerobot_url`;");
+        }
+
+        $query = $connection->executeQuery("SHOW COLUMNS FROM `media` LIKE 'filerobot_uuid'");
+        $result = $query->fetchAllAssociative();
+        if (count($result) == 0) {
+            $connection->executeStatement("ALTER TABLE `media` 
+            ADD COLUMN `filerobot_uuid` VARCHAR(255) NULL AFTER `is_filerobot`;");
         }
     }
 }
