@@ -4,9 +4,8 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
-        <service id="Scaleflex\Filerobot\Core\Content\Media\MediaDefinition">
-            <tag name="shopware.sales_channel.entity.definition"/>
-            <tag name="shopware.sales_channel.composite_search.definition" priority="400"/>
+        <service id="Scaleflex\Filerobot\Extension\Content\Media\MediaExtension">
+            <tag name="shopware.entity.extension"/>
         </service>
     </services>
 </container>

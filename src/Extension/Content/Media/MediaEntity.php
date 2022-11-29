@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Scaleflex\Filerobot\Core\Content\Media;
+namespace Scaleflex\Filerobot\Extension\Content\Media;
 
 use Shopware\Core\Checkout\Document\Aggregate\DocumentBaseConfig\DocumentBaseConfigCollection;
 use Shopware\Core\Checkout\Document\DocumentCollection;
