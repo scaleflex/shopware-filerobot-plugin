@@ -7,5 +7,8 @@
         <service id="Scaleflex\Filerobot\Extension\Content\Media\MediaExtension">
             <tag name="shopware.entity.extension"/>
         </service>
+        <service id="Scaleflex\Filerobot\Subscriber\MediaSubscriber">
+            <tag name="kernel.event_subscriber"/>
+        </service>
     </services>
 </container>

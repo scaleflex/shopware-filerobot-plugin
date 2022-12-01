@@ -197,12 +197,20 @@ Component.register('sw-filerobot-library', {
                         //step 1: create media from filerobot url
                         // Resources/app/administration/src/app/component/media/sw-media-upload-v2/index.js line 337 example
 
-                        files.forEach(async (selected, key) => {
+                        for (const selected of files) {
+                            const key = files.indexOf(selected);
+
                             to_insert.push(selected.file.uuid);
                             let url = new URL(selected.link);
                             let fileExtension = selected.file.extension;
-                            await this.onUrlUpload({url, fileExtension});
-                        });
+                            let media_id = await this.onUrlUpload({url, fileExtension});
+
+                            let media = await this.mediaRepository.get(media_id, Context.api);
+                            console.log(media);
+                            this.selectedItems = [media];
+
+                            this.$emit('media-selection-change', this.selectedItems);
+                        }
 
                         //step 2: write api delete local file just added and update media field `filerobot_url`, `is_filerobot`
 
@@ -282,6 +290,8 @@ Component.register('sw-filerobot-library', {
                 targetId: targetEntity.id, ...fileInfo
             });
             this.useFileUpload();
+
+            return targetEntity.id;
         },
 
         handleMediaServiceUploadEvent({action}) {
