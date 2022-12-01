@@ -199,18 +199,26 @@ Component.register('sw-filerobot-library', {
 
                         for (const selected of files) {
                             const key = files.indexOf(selected);
-
                             to_insert.push(selected.file.uuid);
+
+                            //upload to shopware with FR url
                             let url = new URL(selected.link);
                             let fileExtension = selected.file.extension;
                             let media_id = await this.onUrlUpload({url, fileExtension});
 
-                            let media = await this.mediaRepository.get(media_id, Context.api);
-                            console.log(media);
-                            this.selectedItems = [media];
-
-                            this.$emit('media-selection-change', this.selectedItems);
+                            //waiting while shopware doing upload
+                            let checkUpload = false;
+                            let media = null;
+                            while (!checkUpload) {
+                                await this.sleep(500);
+                                media = await this.mediaRepository.get(media_id, Context.api);
+                                if (media.uploadedAt !== null) {
+                                    checkUpload = true;
+                                }
+                            }
+                            this.selectedItems = this.selection;
                         }
+                        this.$emit('media-selection-change', this.selectedItems);
 
                         //step 2: write api delete local file just added and update media field `filerobot_url`, `is_filerobot`
 
@@ -254,6 +262,10 @@ Component.register('sw-filerobot-library', {
             }
         },
 
+        sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        },
+
         beforeDestroyComponent() {
             this.mediaService.removeByTag(this.uploadTag);
             this.mediaService.removeListener(this.uploadTag, this.handleMediaServiceUploadEvent);
@@ -284,7 +296,7 @@ Component.register('sw-filerobot-library', {
 
             const targetEntity = this.getMediaEntityForUpload();
             await this.mediaRepository.save(targetEntity, Context.api);
-            this.mediaService.addUpload(this.uploadTag, {
+            await this.mediaService.addUpload(this.uploadTag, {
                 src: url,
                 filerobot: true,
                 targetId: targetEntity.id, ...fileInfo
