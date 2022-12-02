@@ -213,15 +213,15 @@ Component.register('sw-filerobot-library', {
                             /**
                              * Todo: need api to check media isset by uuid of FR
                              */
-                            //upload to shopware with FR url
+                                //upload to shopware with FR url
                             let url = new URL(selected.link);
                             let fileExtension = selected.file.extension;
                             let media_id = await this.onUrlUpload({url, fileExtension});
 
                             /**
-                             * Todo: Api delete file
+                             * Todo: Api delete file and update media field `filerobot_url`, `is_filerobot`, filerobot_uuid
                              */
-                            //waiting while shopware doing upload
+                                //waiting while shopware doing upload
                             let checkUpload = false;
                             let media = null;
                             while (!checkUpload) {
