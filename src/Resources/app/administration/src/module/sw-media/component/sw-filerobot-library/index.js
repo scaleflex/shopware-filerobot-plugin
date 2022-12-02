@@ -16,6 +16,7 @@ Component.register('sw-filerobot-library', {
 
     mixins: [
         Mixin.getByName('notification'),
+        Mixin.getByName('media-grid-listener')
     ],
 
     props: {
@@ -87,7 +88,18 @@ Component.register('sw-filerobot-library', {
         },
     },
 
-    watch: {},
+    watch: {
+        selection() {
+            this.selectedItems = this.selection;
+            if (this.listSelectionStartItem !== null && !this.selectedItems.includes(this.listSelectionStartItem)) {
+                this.listSelectionStartItem = this.selectedItems[0] || null;
+            }
+        },
+
+        selectedItems() {
+            this.$emit('media-selection-change', this.selectedItems);
+        },
+    },
 
     created() {
         this.createdComponent();
@@ -152,8 +164,13 @@ Component.register('sw-filerobot-library', {
                 this.mediaService.addListener(this.uploadTag, this.handleMediaServiceUploadEvent);
 
                 let current_url = window.location.href;
+
                 let swMediaSidebarElement = document.getElementsByClassName("sw-media-sidebar no-headline");
                 swMediaSidebarElement[0].style.display = 'none';
+
+                let swMediaFooterElement = document.getElementsByClassName("sw-modal__footer");
+                swMediaFooterElement[0].style.display = 'none';
+
                 if (!Filerobot) {
                     var Filerobot = window.Filerobot;
                 }
@@ -191,21 +208,19 @@ Component.register('sw-filerobot-library', {
                     .use(XHRUpload)
                     .on('export', async (files, popupExportSuccessMsgFn, downloadFilesPackagedFn, downloadFileFn) => {
                         console.dir(files);
-
-                        let to_insert = [];
-
-                        //step 1: create media from filerobot url
-                        // Resources/app/administration/src/app/component/media/sw-media-upload-v2/index.js line 337 example
-
                         for (const selected of files) {
                             const key = files.indexOf(selected);
-                            to_insert.push(selected.file.uuid);
-
+                            /**
+                             * Todo: need api to check media isset by uuid of FR
+                             */
                             //upload to shopware with FR url
                             let url = new URL(selected.link);
                             let fileExtension = selected.file.extension;
                             let media_id = await this.onUrlUpload({url, fileExtension});
 
+                            /**
+                             * Todo: Api delete file
+                             */
                             //waiting while shopware doing upload
                             let checkUpload = false;
                             let media = null;
@@ -220,23 +235,22 @@ Component.register('sw-filerobot-library', {
                         }
                         this.$emit('media-selection-change', this.selectedItems);
 
-                        //step 2: write api delete local file just added and update media field `filerobot_url`, `is_filerobot`
+                        await this.sleep(500);
+                        let modalElement = document.querySelector('.sw-modal.sw-media-modal-v2.sw-modal--full');
+                        modalElement.querySelector('.sw-button.sw-button--primary').click();
 
-                        //step 3: override function get media
-                        // override vendor/shopware/core/Content/Media/MediaDefinition.php
-                        // override vendor/shopware/core/Content/Media/MediaEntity.php
+                        //step 1: check media isset and create media from filerobot url if not isset
+                        // Resources/app/administration/src/app/component/media/sw-media-upload-v2/index.js line 337 example
 
-                        //step 4: get media by id
+                        //step 2: write api delete local file just added and update media field `filerobot_url`, `is_filerobot`, filerobot_uuid
+
+                        //step 3: get media by id
                         // let media = await this.mediaRepository.get('70e352200b5c45098dc65a5b47094a2a', Context.api);
 
-                        //step 5: add media to this.selectedItems
+                        //step 4: add media to this.selectedItems
 
-                        //step 6: add media to product media
+                        //step 5: add media to product media
                         // -> need to try this function -> this.$emit('media-selection-change', this.selectedItems);
-
-                        if (to_insert.length === 0) {
-                            return;
-                        }
                     })
                     .on('complete', ({failed, uploadID, successful}) => {
                         if (failed) {
