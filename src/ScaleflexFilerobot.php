@@ -30,21 +30,11 @@ class ScaleflexFilerobot extends Plugin
          * Delete all related data
          */
         $connection = \Shopware\Core\Kernel::getConnection();
-        $query = $connection->executeQuery("SELECT *
-                    FROM media 
-                    WHERE is_filerobot = 1");
-        $media = $query->fetchAllAssociative();
-        foreach ($media as $item) {
-            $media_id = $item['id'];
-            $connection->executeStatement('DELETE FROM `media_tag` where media_id = "' . $media_id . '"');
-            $connection->executeStatement('DELETE FROM `media_thumbnail` where media_id = "' . $media_id . '"');
-            $connection->executeStatement('DELETE FROM `media_translation` where media_id = "' . $media_id . '"');
+        $query = $connection->executeQuery("SHOW COLUMNS FROM `media` LIKE 'filerobot_url'");
+        $result = $query->fetchAllAssociative();
+        if (count($result) !== 0) {
+            $this->dropFilerobotColumns($connection);
         }
-        $connection->executeStatement('DELETE FROM `media` where is_filerobot = 1');
-        $connection->executeStatement("ALTER TABLE `media` 
-        DROP COLUMN `is_filerobot`,
-        DROP COLUMN `filerobot_url`;
-        DROP COLUMN `filerobot_uuid`;");
     }
 
     public function activate(ActivateContext $activateContext): void
@@ -75,5 +65,29 @@ class ScaleflexFilerobot extends Plugin
             $connection->executeStatement("ALTER TABLE `media` 
             ADD COLUMN `filerobot_uuid` VARCHAR(255) NULL AFTER `is_filerobot`;");
         }
+    }
+
+    /**
+     * Remove Filerobot related columns in media table
+     * @param $connection
+     * @return void
+     */
+    private function dropFilerobotColumns($connection): void
+    {
+        $query = $connection->executeQuery("SELECT *
+                    FROM media 
+                    WHERE is_filerobot = 1");
+        $media = $query->fetchAllAssociative();
+        foreach ($media as $item) {
+            $media_id = $item['id'];
+            $connection->executeStatement('DELETE FROM `media_tag` where media_id = "' . $media_id . '"');
+            $connection->executeStatement('DELETE FROM `media_thumbnail` where media_id = "' . $media_id . '"');
+            $connection->executeStatement('DELETE FROM `media_translation` where media_id = "' . $media_id . '"');
+        }
+        $connection->executeStatement('DELETE FROM `media` where is_filerobot = 1');
+        $connection->executeStatement("ALTER TABLE `media` 
+        DROP COLUMN `is_filerobot`,
+        DROP COLUMN `filerobot_url`;
+        DROP COLUMN `filerobot_uuid`;");
     }
 }
