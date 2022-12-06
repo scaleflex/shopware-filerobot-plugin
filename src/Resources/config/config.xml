@@ -2,6 +2,28 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/platform/trunk/src/Core/System/SystemConfig/Schema/config.xsd">
     <card>
+        <title>Admin access key ID</title>
+        <title lang="de-DE">Activation</title>
+        <input-field type="text">
+            <name>frAdminAccessKeyID</name>
+            <label>Access key ID</label>
+            <label lang="de-DE">Access key ID</label>
+            <placeholder>abcdefgh</placeholder>
+        </input-field>
+    </card>
+
+    <card>
+        <title>Admin secret access key</title>
+        <title lang="de-DE">Activation</title>
+        <input-field type="text">
+            <name>frAdminSecretAccessKey</name>
+            <label>Secret access key</label>
+            <label lang="de-DE">Secret access key</label>
+            <placeholder>abcdefgh</placeholder>
+        </input-field>
+    </card>
+
+    <card>
         <title>Activation</title>
         <title lang="de-DE">Activation</title>
         <input-field type="bool">

@@ -84,10 +84,9 @@ class ScaleflexFilerobot extends Plugin
             $connection->executeStatement('DELETE FROM `media_thumbnail` where media_id = "' . $media_id . '"');
             $connection->executeStatement('DELETE FROM `media_translation` where media_id = "' . $media_id . '"');
         }
-        $connection->executeStatement('DELETE FROM `media` where is_filerobot = 1');
-        $connection->executeStatement("ALTER TABLE `media` 
-        DROP COLUMN `is_filerobot`,
-        DROP COLUMN `filerobot_url`;
+        $connection->executeStatement('DELETE FROM `media` where `is_filerobot` = 1');
+        $connection->executeStatement("ALTER TABLE `media` DROP COLUMN `is_filerobot`,
+        DROP COLUMN `filerobot_url`,
         DROP COLUMN `filerobot_uuid`;");
     }
 }
