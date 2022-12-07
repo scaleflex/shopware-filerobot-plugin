@@ -2,10 +2,14 @@
 
 namespace Scaleflex\Filerobot;
 
+use Shopware\Core\Content\Media\Aggregate\MediaFolder\MediaFolderEntity;
+use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\Plugin;
 use Shopware\Core\Framework\Plugin\Context\InstallContext;
 use Shopware\Core\Framework\Plugin\Context\ActivateContext;
 use Shopware\Core\Framework\Plugin\Context\UninstallContext;
+use Shopware\Core\Framework\Uuid\Uuid;
 
 class ScaleflexFilerobot extends Plugin
 {
@@ -65,6 +69,16 @@ class ScaleflexFilerobot extends Plugin
             $connection->executeStatement("ALTER TABLE `media` 
             ADD COLUMN `filerobot_uuid` VARCHAR(255) NULL AFTER `is_filerobot`;");
         }
+
+        $query = $connection->executeQuery("SELECT HEX(id) FROM `media_folder` WHERE `name` = 'Filerobot DAM'");
+        $result = $query->fetchOne();
+        if ($result) {
+            $folderId = $result;
+        } else {
+            $folderId = $this->createMediaFolderWithConfiguration();
+        }
+        $config = $this->container->get('Shopware\Core\System\SystemConfig\SystemConfigService');
+        $config->set('ScaleflexFilerobot.config.frFolderId', $folderId);
     }
 
     /**
@@ -88,5 +102,34 @@ class ScaleflexFilerobot extends Plugin
         $connection->executeStatement("ALTER TABLE `media` DROP COLUMN `is_filerobot`,
         DROP COLUMN `filerobot_url`,
         DROP COLUMN `filerobot_uuid`;");
+
+        //remove folder "Filerobot"
+        $connection->executeStatement("DELETE FROM `media_folder` where `name` = 'Filerobot DAM'");
+    }
+
+    /**
+     * Create new folder "Filerobot"
+     * @return string
+     */
+    private function createMediaFolderWithConfiguration(): string
+    {
+        $context = Context::createDefaultContext();
+        $mediaFolderRepository = $this->container->get('media_folder.repository');
+
+        $folderId = Uuid::randomHex();
+        $configurationId = Uuid::randomHex();
+
+        $mediaFolderRepository->upsert([
+            [
+                'id' => $folderId,
+                'name' => 'Filerobot DAM',
+                'configuration' => [
+                    'id' => $configurationId,
+                    'createThumbnails' => true,
+                ],
+            ],
+        ], $context);
+
+        return $folderId;
     }
 }

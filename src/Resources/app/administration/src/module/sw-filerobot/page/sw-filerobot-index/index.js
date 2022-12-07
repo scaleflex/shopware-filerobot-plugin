@@ -41,7 +41,25 @@ Component.register('sw-filerobot-index', {
         selection: {
             type: Array,
             required: true,
-        }
+        },
+
+        frAdminAccessKeyID: {
+            type: String,
+            required: false,
+            default: null,
+        },
+
+        frAdminSecretAccessKey: {
+            type: String,
+            required: false,
+            default: null,
+        },
+
+        adminAuthToken: {
+            type: String,
+            required: false,
+            default: null,
+        },
     },
 
     data() {
@@ -74,6 +92,8 @@ Component.register('sw-filerobot-index', {
             let frSEC = frConfig['ScaleflexFilerobot.config.frSEC'];
             let frToken = frConfig['ScaleflexFilerobot.config.frToken'];
             let frUploadDirectory = frConfig['ScaleflexFilerobot.config.frUploadDirectory'];
+            let frAdminAccessKeyID = frConfig['ScaleflexFilerobot.config.frAdminAccessKeyID'];
+            let frAdminSecretAccessKey = frConfig['ScaleflexFilerobot.config.frAdminSecretAccessKey'];
 
             if (frActivation === true) {
                 if (frToken !== '' || frSEC !== '') {
@@ -167,6 +187,6 @@ Component.register('sw-filerobot-index', {
             } else {
                 console.log('Filerobot is unauthorized.');
             }
-        },
+        }
     },
 });
