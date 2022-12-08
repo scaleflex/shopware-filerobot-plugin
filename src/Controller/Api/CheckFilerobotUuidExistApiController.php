@@ -37,7 +37,7 @@ class CheckFilerobotUuidExistApiController extends AbstractController
     {
         $filerobotUuid = $request->get('filerobot_uuid');
         if (empty($filerobotUuid)) {
-            throw new \Exception('filerobot_uuid must not be empty');
+            throw new \Exception('filerobot_uuid is required and must not be empty');
         }
 
         return $filerobotUuid;
