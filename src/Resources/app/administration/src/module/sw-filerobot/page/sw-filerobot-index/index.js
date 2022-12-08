@@ -94,34 +94,68 @@ Component.register('sw-filerobot-index', {
             let frUploadDirectory = frConfig['ScaleflexFilerobot.config.frUploadDirectory'];
             let frAdminAccessKeyID = frConfig['ScaleflexFilerobot.config.frAdminAccessKeyID'];
             let frAdminSecretAccessKey = frConfig['ScaleflexFilerobot.config.frAdminSecretAccessKey'];
+            let frFolderId = frConfig['ScaleflexFilerobot.config.frFolderId'];
 
             if (frActivation === true) {
                 if (frToken !== '' || frSEC !== '') {
                     let sass = '';
                     let apiGetSass = 'https://api.filerobot.com/' + frToken + '/key/' + frSEC;
-                    let responseSass = await fetch(apiGetSass, {
+
+                    await fetch(apiGetSass, {
                         method: 'GET',
                         timeout: 30,
                         headers: {
                             'Content-Type': 'application/json; charset=utf-8',
                         }
-                    });
-                    responseSass = responseSass.json();
+                    }).then((response) => response.json())
+                        .then((data) => {
+                            if (data.status !== undefined && data.status !== 'error') {
+                                sass = data.key;
+                            }
 
-                    if (responseSass.status !== undefined && responseSass.status !== 'error') {
-                        sass = responseSass.key;
-                    }
+                            if (sass === '') {
+                                console.log('Filerobot has faild to get key.');
+                            } else {
+                                this.frToken = frToken;
+                                this.frSass = sass;
+                                this.frUploadDirectory = frUploadDirectory;
+                                this.frActivation = frActivation;
+                                this.frSEC = frSEC;
+                                this.frAdminAccessKeyID = frAdminAccessKeyID;
+                                this.frAdminSecretAccessKey = frAdminSecretAccessKey;
+                                this.frFolderId = frFolderId;
+
+                                let oauthURL = window.location.origin + '/api/oauth/token';
+                                fetch(oauthURL, {
+                                    method: 'POST',
+                                    timeout: 30,
+                                    headers: {
+                                        'Content-Type': 'application/json; charset=utf-8',
+                                    },
+                                    body: JSON.stringify({
+                                        "client_id": this.frAdminAccessKeyID,
+                                        "client_secret": this.frAdminSecretAccessKey,
+                                        "grant_type": "client_credentials"
+                                    })
+                                }).then((response) => response.json())
+                                    .then((data) => {
+                                        if (data.access_token !== undefined && data.access_token !== '') {
+                                            this.adminAuthToken = data.access_token;
+                                        }
+                                    })
+                                    .catch((error) => {
+                                        console.error('Error:', error);
+                                    });
+                            }
+                        })
+                        .catch((error) => {
+                            console.error('Error:', error);
+                        });
 
                     if (sass !== '') {
-                        console.log('Filerobot has faild to get key.');
-                        return false;
-                    } else {
-                        this.frToken = frToken;
-                        this.frSass = sass;
-                        this.frUploadDirectory = frUploadDirectory;
-                        this.frActivation = frActivation;
-                        this.frSEC = frSEC;
                         return true;
+                    } else {
+                        return false;
                     }
                 } else {
                     console.log('Filerobot token or Security template identifier is empty');

@@ -267,7 +267,7 @@ Component.register('sw-filerobot-library', {
                     })
                     .use(XHRUpload)
                     .on('export', async (files, popupExportSuccessMsgFn, downloadFilesPackagedFn, downloadFileFn) => {
-                        console.dir(files);
+                        // console.dir(files);
                         for (const selected of files) {
                             const key = files.indexOf(selected);
                             /**
@@ -293,20 +293,46 @@ Component.register('sw-filerobot-library', {
                                         let media = await this.mediaRepository.get(media_id, Context.api);
                                         this.selection.push(media);
                                     } else {
-                                        //upload to shopware with FR url
+                                        /**
+                                         * Upload to shopware with FR url
+                                         */
                                         let url = new URL(selected.link);
                                         let fileExtension = selected.file.extension;
                                         let media_id = await this.onUrlUpload({url, fileExtension});
 
                                         /**
-                                         * Todo: Api delete file and update media field `filerobot_url`, `is_filerobot`, filerobot_uuid
+                                         * Waiting while shopware doing upload
                                          */
-                                            //waiting while shopware doing upload
                                         let checkUpload = false;
                                         while (!checkUpload) {
                                             await this.sleep(500);
                                             media = await this.mediaRepository.get(media_id, Context.api);
                                             if (media.uploadedAt !== null) {
+                                                let mediaURL = media.url;
+                                                let mediaPath = mediaURL.replace(window.location.origin, '');
+                                                let deleteURL = window.location.origin + '/api/scaleflex/filerobot/clean-up-media';
+                                                fetch(deleteURL, {
+                                                    method: 'POST',
+                                                    timeout: 30,
+                                                    headers: {
+                                                        'Content-Type': 'application/json; charset=utf-8',
+                                                        'Authorization': 'Bearer ' + this.adminAuthToken
+                                                    },
+                                                    body: JSON.stringify({
+                                                        "media_id": media_id,
+                                                        "filerobot_url": selected.file.url.cdn,
+                                                        "filerobot_uuid": selected.file.uuid,
+                                                        "media_path": mediaPath
+                                                    })
+                                                }).then((response) => response.json())
+                                                    .then((data) => {
+                                                        if (!data) {
+                                                            console.log('Clean up media had failed.')
+                                                        }
+                                                    })
+                                                    .catch((error) => {
+                                                        console.error('Error:', error);
+                                                    });
                                                 checkUpload = true;
                                             }
                                         }
@@ -322,19 +348,6 @@ Component.register('sw-filerobot-library', {
                         await this.sleep(500);
                         let modalElement = document.querySelector('.sw-modal.sw-media-modal-v2.sw-modal--full');
                         modalElement.querySelector('.sw-button.sw-button--primary').click();
-
-                        //step 1: check media isset and create media from filerobot url if not isset
-                        // Resources/app/administration/src/app/component/media/sw-media-upload-v2/index.js line 337 example
-
-                        //step 2: write api delete local file just added and update media field `filerobot_url`, `is_filerobot`, filerobot_uuid
-
-                        //step 3: get media by id
-                        // let media = await this.mediaRepository.get('70e352200b5c45098dc65a5b47094a2a', Context.api);
-
-                        //step 4: add media to this.selectedItems
-
-                        //step 5: add media to product media
-                        // -> need to try this function -> this.$emit('media-selection-change', this.selectedItems);
                     })
                     .on('complete', ({failed, uploadID, successful}) => {
                         if (failed) {
@@ -342,12 +355,9 @@ Component.register('sw-filerobot-library', {
                         }
 
                         if (successful) {
-                            console.dir(successful);
-
-                            var to_insert = [];
-
+                            // console.dir(successful);
                             successful.forEach((item, key) => {
-                                to_insert.push(item.uuid);
+                                // do something
                             });
                         }
                     });
