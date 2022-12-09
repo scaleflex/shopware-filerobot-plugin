@@ -73,8 +73,8 @@
         <title lang="de-DE">Security Template Identifier</title>
         <input-field type="text">
             <name>frSEC</name>
-            <label>To load the Filerobot Widget or Filerobot Image Editor, you you need to create a Security Template in your Filerobot Asset Hub first, in order for your WordPress instantiation of the Filerobot Widget to obtain proper credentials and access your storage</label>
-            <label lang="de-DE">To load the Filerobot Widget or Filerobot Image Editor, you you need to create a Security Template in your Filerobot Asset Hub first, in order for your WordPress instantiation of the Filerobot Widget to obtain proper credentials and access your storage</label>
+            <label>To load the Filerobot Widget or Filerobot Image Editor, you need to create a Security Template in your Filerobot Asset Hub first, in order for your Shopware instantiation of the Filerobot Widget to obtain proper credentials and access your storage.</label>
+            <label lang="de-DE">To load the Filerobot Widget or Filerobot Image Editor, you need to create a Security Template in your Filerobot Asset Hub first, in order for your Shopware instantiation of the Filerobot Widget to obtain proper credentials and access your storage.</label>
             <placeholder>SECU_3268740A1382466B9XBC390D8</placeholder>
         </input-field>
     </card>
