@@ -11,7 +11,7 @@
 
 - Step 1: In Admin go to Extensions -> Store -> Catalog search for "Filerobot by Scaleflex"
 - Step 2: Click into extension and after that "Add extension"
-- Step 3: Go to Extensions -> My extensions -> "Filerobot - Digital Asset Management, Media Optimisation and Acceleration" -> Click on "Configuration"
+- Step 3: Go to Extensions -> My extensions -> "Filerobot by Scaleflex - Digital Asset Management, Media Optimisation and Acceleration" -> Click on "Configuration"
   ![](docs/get-configuration.png)
 - Step 4: Update configuration and activate the Module, then your site is ready to go.
   ![](docs/configuration.png)
