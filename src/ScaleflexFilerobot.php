@@ -2,9 +2,9 @@
 
 namespace Scaleflex\Filerobot;
 
-use Shopware\Core\Content\Media\Aggregate\MediaFolder\MediaFolderEntity;
+use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Doctrine\MultiInsertQueryQueue;
 use Shopware\Core\Framework\Plugin;
 use Shopware\Core\Framework\Plugin\Context\InstallContext;
 use Shopware\Core\Framework\Plugin\Context\ActivateContext;
@@ -104,29 +104,45 @@ class ScaleflexFilerobot extends Plugin
         DROP COLUMN `filerobot_uuid`;");
 
         //remove folder "Filerobot"
+        $connection->executeStatement("DELETE FROM `media_default_folder` where `association_fields` = '[\"filerobotMedia\"]'");
         $connection->executeStatement("DELETE FROM `media_folder` where `name` = 'Filerobot DAM'");
     }
 
     /**
-     * Create new folder "Filerobot"
+     * Create new folder "Filerobot DAM"
      * @return string
      */
     private function createMediaFolderWithConfiguration(): string
     {
         $context = Context::createDefaultContext();
+        $connection = \Shopware\Core\Kernel::getConnection();
+        $query = $connection->executeQuery("SELECT HEX(id) FROM `media_default_folder` WHERE `association_fields` LIKE '%filerobotMedia%'");
+        $result = $query->fetchOne();
+        if ($result) {
+            $defaultFolderId = $result;
+        } else {
+            $defaultFolderId = Uuid::randomHex();
+            $queue = new MultiInsertQueryQueue($connection);
+            $queue->addInsert(
+                'media_default_folder',
+                [
+                    'id' => $defaultFolderId,
+                    'association_fields' => '["filerobotMedia"]',
+                    'entity' => 'filerobot',
+                    'created_at' => (new \DateTime())->format(Defaults::STORAGE_DATE_TIME_FORMAT)]
+            );
+            $queue->execute();
+        }
+
         $mediaFolderRepository = $this->container->get('media_folder.repository');
-
         $folderId = Uuid::randomHex();
-        $configurationId = Uuid::randomHex();
-
         $mediaFolderRepository->upsert([
             [
                 'id' => $folderId,
                 'name' => 'Filerobot DAM',
-                'configuration' => [
-                    'id' => $configurationId,
-                    'createThumbnails' => true,
-                ],
+                'useParentConfiguration' => false,
+                'configuration' => [],
+                'defaultFolderId' => $defaultFolderId
             ],
         ], $context);
 

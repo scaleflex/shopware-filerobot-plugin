@@ -311,6 +311,8 @@ Component.register('sw-filerobot-library', {
                                                 let mediaURL = media.url;
                                                 let mediaPath = mediaURL.replace(window.location.origin, '');
                                                 let deleteURL = window.location.origin + '/api/scaleflex/filerobot/clean-up-media';
+                                                let filerobotURL = selected.file.url.cdn;
+                                                filerobotURL = filerobotURL.split('?')[0];
                                                 fetch(deleteURL, {
                                                     method: 'POST',
                                                     timeout: 30,
@@ -320,7 +322,7 @@ Component.register('sw-filerobot-library', {
                                                     },
                                                     body: JSON.stringify({
                                                         "media_id": media_id,
-                                                        "filerobot_url": selected.file.url.cdn,
+                                                        "filerobot_url": filerobotURL,
                                                         "filerobot_uuid": selected.file.uuid,
                                                         "media_path": mediaPath
                                                     })
