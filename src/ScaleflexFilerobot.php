@@ -88,12 +88,12 @@ class ScaleflexFilerobot extends Plugin
      */
     private function dropFilerobotColumns($connection): void
     {
-        $query = $connection->executeQuery("SELECT *
+        $query = $connection->executeQuery("SELECT HEX(id) as id
                     FROM media 
                     WHERE is_filerobot = 1");
         $media = $query->fetchAllAssociative();
         foreach ($media as $item) {
-            $media_id = $item['id'];
+            $media_id = strtolower($item['id']);
             $connection->executeStatement('DELETE FROM `media_tag` where media_id = "' . $media_id . '"');
             $connection->executeStatement('DELETE FROM `media_thumbnail` where media_id = "' . $media_id . '"');
             $connection->executeStatement('DELETE FROM `media_translation` where media_id = "' . $media_id . '"');
