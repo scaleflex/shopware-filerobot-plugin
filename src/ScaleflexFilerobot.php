@@ -119,9 +119,9 @@ class ScaleflexFilerobot extends Plugin
         $query = $connection->executeQuery("SELECT HEX(id) FROM `media_default_folder` WHERE `association_fields` LIKE '%filerobotMedia%'");
         $result = $query->fetchOne();
         if ($result) {
-            $defaultFolderId = $result;
+            $defaultFolderId = strtolower($result);
         } else {
-            $defaultFolderId = Uuid::randomHex();
+            $defaultFolderId = Uuid::randomBytes();
             $queue = new MultiInsertQueryQueue($connection);
             $queue->addInsert(
                 'media_default_folder',
@@ -132,6 +132,8 @@ class ScaleflexFilerobot extends Plugin
                     'created_at' => (new \DateTime())->format(Defaults::STORAGE_DATE_TIME_FORMAT)]
             );
             $queue->execute();
+
+            $defaultFolderId = strtolower(Uuid::fromBytesToHex($defaultFolderId));
         }
 
         $mediaFolderRepository = $this->container->get('media_folder.repository');
