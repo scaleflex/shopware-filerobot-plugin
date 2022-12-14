@@ -24,12 +24,12 @@
     </card>
 
     <card>
-        <title>Folder Id</title>
-        <title lang="de-DE">Folder Id</title>
+        <title>Media folder Id</title>
+        <title lang="de-DE">Media folder Id</title>
         <input-field type="text">
             <name>frFolderId</name>
-            <label>Folder ID will auto generate when plugin activate</label>
-            <label lang="de-DE">Folder ID will auto generate when plugin activate</label>
+            <label>Media folder ID will auto generate when plugin activate</label>
+            <label lang="de-DE">Media folder ID will auto generate when plugin activate</label>
             <placeholder>abcdefgh</placeholder>
             <disabled>true</disabled>
         </input-field>
