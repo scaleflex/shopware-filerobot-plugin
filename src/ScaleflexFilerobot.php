@@ -93,10 +93,10 @@ class ScaleflexFilerobot extends Plugin
                     WHERE is_filerobot = 1");
         $media = $query->fetchAllAssociative();
         foreach ($media as $item) {
-            $media_id = strtolower($item['id']);
-            $connection->executeStatement('DELETE FROM `media_tag` where media_id = "' . $media_id . '"');
-            $connection->executeStatement('DELETE FROM `media_thumbnail` where media_id = "' . $media_id . '"');
-            $connection->executeStatement('DELETE FROM `media_translation` where media_id = "' . $media_id . '"');
+            $media_id = $item['id'];
+            $connection->executeStatement('DELETE FROM `media_tag` where media_id = UNHEX("' . $media_id . '")');
+            $connection->executeStatement('DELETE FROM `media_thumbnail` where media_id = UNHEX("' . $media_id . '")');
+            $connection->executeStatement('DELETE FROM `media_translation` where media_id = UNHEX("' . $media_id . '")');
         }
         $connection->executeStatement('DELETE FROM `media` where `is_filerobot` = 1');
         $connection->executeStatement("ALTER TABLE `media` DROP COLUMN `is_filerobot`,
