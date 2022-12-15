@@ -276,6 +276,11 @@ Component.register('sw-filerobot-library', {
                                     this.adminAuthToken = data.access_token;
                                 }
 
+                                let frFooterButton = document.getElementsByClassName("SfxButton-root");
+                                for (let i = 0; i < frFooterButton.length; i++) {
+                                    frFooterButton[i].setAttribute('disabled', 'true');
+                                }
+
                                 if (this.adminAuthToken !== null) {
                                     for (const selected of files) {
                                         /**
@@ -341,11 +346,18 @@ Component.register('sw-filerobot-library', {
                                                                             title: this.$tc('global.default.error'),
                                                                             message: "Clean up media had failed."
                                                                         });
-                                                                        console.log('Clean up media had failed.')
+                                                                        console.log('Clean up media had failed.');
+
+                                                                        for (let i = 0; i < frFooterButton.length; i++) {
+                                                                            frFooterButton[i].removeAttribute('disabled');
+                                                                        }
                                                                     }
                                                                 })
                                                                 .catch((error) => {
                                                                     console.error('Error:', error);
+                                                                    for (let i = 0; i < frFooterButton.length; i++) {
+                                                                        frFooterButton[i].removeAttribute('disabled');
+                                                                    }
                                                                 });
                                                             checkUpload = true;
                                                         }
@@ -354,6 +366,9 @@ Component.register('sw-filerobot-library', {
                                             })
                                             .catch((error) => {
                                                 console.error('Error:', error);
+                                                for (let i = 0; i < frFooterButton.length; i++) {
+                                                    frFooterButton[i].removeAttribute('disabled');
+                                                }
                                             });
                                         this.selectedItems = this.selection;
                                     }
