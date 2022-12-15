@@ -26,11 +26,11 @@
   "extra": {
     "shopware-plugin-class": "Scaleflex\\Filerobot\\ScaleflexFilerobot",
     "label": {
-      "de-DE": "Filerobot by Scaleflex - Digital Asset Management, Media Optimisation and Acceleration",
+      "de-DE": "Filerobot von Scaleflex - Digital Asset Management, Medienoptimierung und -beschleunigung",
       "en-GB": "Filerobot by Scaleflex - Digital Asset Management, Media Optimisation and Acceleration"
     },
     "description": {
-      "de-DE": "Filerobot by Scaleflex normalizes, resizes, optimizes and distributes your images rocket fast around the world.",
+      "de-DE": "Filerobot von Scaleflex normalisiert, verkleinert, optimiert und verteilt Ihre Bilder raketenschnell in die ganze Welt.",
       "en-GB": "Filerobot by Scaleflex normalizes, resizes, optimizes and distributes your images rocket fast around the world."
     },
     "manufacturerLink": {

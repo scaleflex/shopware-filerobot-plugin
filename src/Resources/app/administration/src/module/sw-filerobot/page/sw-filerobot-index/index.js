@@ -114,6 +114,10 @@ Component.register('sw-filerobot-index', {
                             }
 
                             if (sass === '') {
+                                this.createNotificationError({
+                                    title: this.$tc('global.default.error'),
+                                    message: "Filerobot has faild to get key."
+                                });
                                 console.log('Filerobot has faild to get key.');
                             } else {
                                 this.frToken = frToken;
@@ -124,28 +128,6 @@ Component.register('sw-filerobot-index', {
                                 this.frAdminAccessKeyID = frAdminAccessKeyID;
                                 this.frAdminSecretAccessKey = frAdminSecretAccessKey;
                                 this.frFolderId = frFolderId;
-
-                                let oauthURL = window.location.origin + '/api/oauth/token';
-                                fetch(oauthURL, {
-                                    method: 'POST',
-                                    timeout: 30,
-                                    headers: {
-                                        'Content-Type': 'application/json; charset=utf-8',
-                                    },
-                                    body: JSON.stringify({
-                                        "client_id": this.frAdminAccessKeyID,
-                                        "client_secret": this.frAdminSecretAccessKey,
-                                        "grant_type": "client_credentials"
-                                    })
-                                }).then((response) => response.json())
-                                    .then((data) => {
-                                        if (data.access_token !== undefined && data.access_token !== '') {
-                                            this.adminAuthToken = data.access_token;
-                                        }
-                                    })
-                                    .catch((error) => {
-                                        console.error('Error:', error);
-                                    });
                             }
                         })
                         .catch((error) => {
@@ -158,10 +140,18 @@ Component.register('sw-filerobot-index', {
                         return false;
                     }
                 } else {
-                    console.log('Filerobot token or Security template identifier is empty');
+                    this.createNotificationError({
+                        title: this.$tc('global.default.error'),
+                        message: "Filerobot token or Security template identifier is empty. Please check again your plugin configuration."
+                    });
+                    console.log('Filerobot token or Security template identifier is empty. Please check again your plugin configuration.');
                     return false;
                 }
             } else {
+                this.createNotificationError({
+                    title: this.$tc('global.default.error'),
+                    message: "Filerobot is not active. Please check again your plugin configuration."
+                });
                 console.log('Filerobot is not active');
                 return false;
             }
@@ -219,6 +209,10 @@ Component.register('sw-filerobot-index', {
                     window.history.pushState(null, document.title, current_url);
                 }, 1000);
             } else {
+                this.createNotificationError({
+                    title: this.$tc('global.default.error'),
+                    message: "Filerobot is unauthorized."
+                });
                 console.log('Filerobot is unauthorized.');
             }
         }

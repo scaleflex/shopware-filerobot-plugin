@@ -3,33 +3,33 @@
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/platform/trunk/src/Core/System/SystemConfig/Schema/config.xsd">
     <card>
         <title>Admin access key ID</title>
-        <title lang="de-DE">Admin access key ID</title>
+        <title lang="de-DE">Admin-Zugangsschlüssel ID</title>
         <input-field type="text">
             <name>frAdminAccessKeyID</name>
             <label>Access key ID</label>
-            <label lang="de-DE">Access key ID</label>
+            <label lang="de-DE">Zugangsschlüssel ID</label>
             <placeholder>abcdefgh</placeholder>
         </input-field>
     </card>
 
     <card>
         <title>Admin secret access key</title>
-        <title lang="de-DE">Admin secret access key</title>
+        <title lang="de-DE">Geheimer Admin-Zugangsschlüssel</title>
         <input-field type="text">
             <name>frAdminSecretAccessKey</name>
             <label>Secret access key</label>
-            <label lang="de-DE">Secret access key</label>
+            <label lang="de-DE">Geheimer Zugriffsschlüssel</label>
             <placeholder>abcdefgh</placeholder>
         </input-field>
     </card>
 
     <card>
         <title>Media folder Id</title>
-        <title lang="de-DE">Media folder Id</title>
+        <title lang="de-DE">Medienordner-ID</title>
         <input-field type="text">
             <name>frFolderId</name>
             <label>Media folder ID will auto generate when plugin activate</label>
-            <label lang="de-DE">Media folder ID will auto generate when plugin activate</label>
+            <label lang="de-DE">Die Medienordner-ID wird automatisch generiert, wenn das Plugin aktiviert wird</label>
             <placeholder>abcdefgh</placeholder>
             <disabled>true</disabled>
         </input-field>
@@ -37,11 +37,11 @@
 
     <card>
         <title>Activation</title>
-        <title lang="de-DE">Activation</title>
+        <title lang="de-DE">Aktivierung</title>
         <input-field type="bool">
             <name>frActivation</name>
             <label>Enable/Disable the Module</label>
-            <label lang="de-DE">Enable/Disable the Module</label>
+            <label lang="de-DE">Aktivieren/Deaktivieren des Moduls</label>
             <defaultValue>true</defaultValue>
         </input-field>
     </card>
@@ -52,7 +52,7 @@
         <input-field type="text">
             <name>frToken</name>
             <label>Filerobot token from your Filerobot account</label>
-            <label lang="de-DE">Filerobot token from your Filerobot account</label>
+            <label lang="de-DE">Filerobot-Token von Ihrem Filerobot-Konto</label>
             <placeholder>abcdefgh</placeholder>
         </input-field>
     </card>
@@ -63,29 +63,29 @@
         <input-field type="text">
             <name>frCNAME</name>
             <label>Enter the CNAME as per configuration done in your Filerobot Asset Hub interface, once validated and SSL certificate accepted. (Or leave blank if none)</label>
-            <label lang="de-DE">Enter the CNAME as per configuration done in your Filerobot Asset Hub interface, once validated and SSL certificate accepted. (Or leave blank if none)</label>
+            <label lang="de-DE">Geben Sie den CNAME gemäß der Konfiguration in Ihrer Filerobot Asset Hub-Schnittstelle ein, sobald er validiert und das SSL-Zertifikat akzeptiert wurde. (Oder lassen Sie ihn leer, wenn Sie keinen haben)</label>
             <placeholder>media.mydomain.com</placeholder>
         </input-field>
     </card>
 
     <card>
         <title>Security Template Identifier</title>
-        <title lang="de-DE">Security Template Identifier</title>
+        <title lang="de-DE">Identifikator der Sicherheitsvorlage</title>
         <input-field type="text">
             <name>frSEC</name>
             <label>To load the Filerobot Widget or Filerobot Image Editor, you need to create a Security Template in your Filerobot Asset Hub first, in order for your Shopware instantiation of the Filerobot Widget to obtain proper credentials and access your storage.</label>
-            <label lang="de-DE">To load the Filerobot Widget or Filerobot Image Editor, you need to create a Security Template in your Filerobot Asset Hub first, in order for your Shopware instantiation of the Filerobot Widget to obtain proper credentials and access your storage.</label>
+            <label lang="de-DE">Um das Filerobot Widget oder den Filerobot Image Editor zu laden, müssen Sie zunächst eine Sicherheitsvorlage in Ihrem Filerobot Asset Hub erstellen, damit Ihre Shopware-Instanziierung des Filerobot Widget die richtigen Anmeldeinformationen erhält und auf Ihren Speicher zugreifen kann.</label>
             <placeholder>SECU_3268740A1382466B9XBC390D8</placeholder>
         </input-field>
     </card>
 
     <card>
         <title>Filerobot upload directory</title>
-        <title lang="de-DE">Filerobot upload directory</title>
+        <title lang="de-DE">Filerobot Upload-Verzeichnis</title>
         <input-field type="text">
             <name>frUploadDirectory</name>
             <label>The directory in your Filerobot account, where the files will be stored</label>
-            <label lang="de-DE">The directory in your Filerobot account, where the files will be stored</label>
+            <label lang="de-DE">Das Verzeichnis in Ihrem Filerobot-Konto, in dem die Dateien gespeichert werden sollen</label>
             <placeholder>/wp_assets</placeholder>
             <defaultValue>/wp_assets</defaultValue>
         </input-field>

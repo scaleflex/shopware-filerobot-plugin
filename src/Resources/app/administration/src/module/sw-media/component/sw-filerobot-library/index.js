@@ -166,6 +166,10 @@ Component.register('sw-filerobot-library', {
                             }
 
                             if (sass === '') {
+                                this.createNotificationError({
+                                    title: this.$tc('global.default.error'),
+                                    message: "Filerobot has faild to get key."
+                                });
                                 console.log('Filerobot has faild to get key.');
                             } else {
                                 this.frToken = frToken;
@@ -176,28 +180,6 @@ Component.register('sw-filerobot-library', {
                                 this.frAdminAccessKeyID = frAdminAccessKeyID;
                                 this.frAdminSecretAccessKey = frAdminSecretAccessKey;
                                 this.frFolderId = frFolderId;
-
-                                let oauthURL = window.location.origin + '/api/oauth/token';
-                                fetch(oauthURL, {
-                                    method: 'POST',
-                                    timeout: 30,
-                                    headers: {
-                                        'Content-Type': 'application/json; charset=utf-8',
-                                    },
-                                    body: JSON.stringify({
-                                        "client_id": this.frAdminAccessKeyID,
-                                        "client_secret": this.frAdminSecretAccessKey,
-                                        "grant_type": "client_credentials"
-                                    })
-                                }).then((response) => response.json())
-                                    .then((data) => {
-                                        if (data.access_token !== undefined && data.access_token !== '') {
-                                            this.adminAuthToken = data.access_token;
-                                        }
-                                    })
-                                    .catch((error) => {
-                                        console.error('Error:', error);
-                                    });
                             }
                         })
                         .catch((error) => {
@@ -210,11 +192,19 @@ Component.register('sw-filerobot-library', {
                         return false;
                     }
                 } else {
-                    console.log('Filerobot token or Security template identifier is empty');
+                    this.createNotificationError({
+                        title: this.$tc('global.default.error'),
+                        message: "Filerobot token or Security template identifier is empty. Please check again your plugin configuration."
+                    });
+                    console.log('Filerobot token or Security template identifier is empty. Please check again your plugin configuration.');
                     return false;
                 }
             } else {
-                console.log('Filerobot is not active');
+                this.createNotificationError({
+                    title: this.$tc('global.default.error'),
+                    message: "Filerobot is not active. Please check again your plugin configuration."
+                });
+                console.log('Filerobot is not active. Please check again your plugin configuration.');
                 return false;
             }
         },
@@ -268,88 +258,122 @@ Component.register('sw-filerobot-library', {
                     .use(XHRUpload)
                     .on('export', async (files, popupExportSuccessMsgFn, downloadFilesPackagedFn, downloadFileFn) => {
                         // console.dir(files);
-                        for (const selected of files) {
-                            const key = files.indexOf(selected);
-                            /**
-                             * Check media by uuid
-                             * @type {string}
-                             */
-                            let checkURL = window.location.origin + '/api/scaleflex/filerobot/check-filerobot-uuid-exist';
-                            await fetch(checkURL, {
-                                method: 'POST',
-                                timeout: 30,
-                                headers: {
-                                    'Content-Type': 'application/json; charset=utf-8',
-                                    'Authorization': 'Bearer ' + this.adminAuthToken
-                                },
-                                body: JSON.stringify({
-                                    "filerobot_uuid": selected.file.uuid
-                                })
-                            }).then((response) => response.json())
-                                .then(async (data) => {
-                                    let media = null;
-                                    if (data !== false) {
-                                        let media_id = data[0].toLowerCase();
-                                        let media = await this.mediaRepository.get(media_id, Context.api);
-                                        this.selection.push(media);
-                                    } else {
-                                        /**
-                                         * Upload to shopware with FR url
-                                         */
-                                        let url = new URL(selected.link);
-                                        let fileExtension = selected.file.extension;
-                                        let media_id = await this.onUrlUpload({url, fileExtension});
+                        let oauthURL = window.location.origin + '/api/oauth/token';
+                        fetch(oauthURL, {
+                            method: 'POST',
+                            timeout: 30,
+                            headers: {
+                                'Content-Type': 'application/json; charset=utf-8',
+                            },
+                            body: JSON.stringify({
+                                "client_id": this.frAdminAccessKeyID,
+                                "client_secret": this.frAdminSecretAccessKey,
+                                "grant_type": "client_credentials"
+                            })
+                        }).then((response) => response.json())
+                            .then((data) => {
+                                if (data.access_token !== undefined && data.access_token !== '') {
+                                    this.adminAuthToken = data.access_token;
+                                }
+                            })
+                            .catch((error) => {
+                                console.error('Error:', error);
+                            });
 
-                                        /**
-                                         * Waiting while shopware doing upload
-                                         */
-                                        let checkUpload = false;
-                                        while (!checkUpload) {
-                                            await this.sleep(500);
-                                            media = await this.mediaRepository.get(media_id, Context.api);
-                                            if (media.uploadedAt !== null) {
-                                                let mediaURL = media.url;
-                                                let mediaPath = mediaURL.replace(window.location.origin, '');
-                                                let deleteURL = window.location.origin + '/api/scaleflex/filerobot/clean-up-media';
-                                                let filerobotURL = selected.file.url.cdn;
-                                                filerobotURL = filerobotURL.split('?')[0];
-                                                fetch(deleteURL, {
-                                                    method: 'POST',
-                                                    timeout: 30,
-                                                    headers: {
-                                                        'Content-Type': 'application/json; charset=utf-8',
-                                                        'Authorization': 'Bearer ' + this.adminAuthToken
-                                                    },
-                                                    body: JSON.stringify({
-                                                        "media_id": media_id,
-                                                        "filerobot_url": filerobotURL,
-                                                        "filerobot_uuid": selected.file.uuid,
-                                                        "media_path": mediaPath
-                                                    })
-                                                }).then((response) => response.json())
-                                                    .then((data) => {
-                                                        if (!data) {
-                                                            console.log('Clean up media had failed.')
-                                                        }
-                                                    })
-                                                    .catch((error) => {
-                                                        console.error('Error:', error);
-                                                    });
-                                                checkUpload = true;
+                        if (this.adminAuthToken !== null) {
+                            for (const selected of files) {
+                                /**
+                                 * Check media by uuid
+                                 * @type {string}
+                                 */
+                                let checkURL = window.location.origin + '/api/scaleflex/filerobot/check-filerobot-uuid-exist';
+                                await fetch(checkURL, {
+                                    method: 'POST',
+                                    timeout: 30,
+                                    headers: {
+                                        'Content-Type': 'application/json; charset=utf-8',
+                                        'Authorization': 'Bearer ' + this.adminAuthToken
+                                    },
+                                    body: JSON.stringify({
+                                        "filerobot_uuid": selected.file.uuid
+                                    })
+                                }).then((response) => response.json())
+                                    .then(async (data) => {
+                                        let media = null;
+                                        if (data !== false) {
+                                            let media_id = data[0].toLowerCase();
+                                            let media = await this.mediaRepository.get(media_id, Context.api);
+                                            this.selection.push(media);
+                                        } else {
+                                            /**
+                                             * Upload to shopware with FR url
+                                             */
+                                            let url = new URL(selected.link);
+                                            let fileExtension = selected.file.extension;
+                                            let media_id = await this.onUrlUpload({url, fileExtension});
+
+                                            /**
+                                             * Waiting while shopware doing upload
+                                             */
+                                            let checkUpload = false;
+                                            while (!checkUpload) {
+                                                await this.sleep(500);
+                                                media = await this.mediaRepository.get(media_id, Context.api);
+                                                if (media.uploadedAt !== null) {
+                                                    let mediaURL = media.url;
+                                                    let mediaPath = mediaURL.replace(window.location.origin, '');
+                                                    let deleteURL = window.location.origin + '/api/scaleflex/filerobot/clean-up-media';
+                                                    let filerobotURL = selected.file.url.cdn;
+                                                    filerobotURL = filerobotURL.split('?')[0];
+                                                    fetch(deleteURL, {
+                                                        method: 'POST',
+                                                        timeout: 30,
+                                                        headers: {
+                                                            'Content-Type': 'application/json; charset=utf-8',
+                                                            'Authorization': 'Bearer ' + this.adminAuthToken
+                                                        },
+                                                        body: JSON.stringify({
+                                                            "media_id": media_id,
+                                                            "filerobot_url": filerobotURL,
+                                                            "filerobot_uuid": selected.file.uuid,
+                                                            "media_path": mediaPath
+                                                        })
+                                                    }).then((response) => response.json())
+                                                        .then((data) => {
+                                                            if (!data) {
+                                                                this.createNotificationError({
+                                                                    title: this.$tc('global.default.error'),
+                                                                    message: "Clean up media had failed."
+                                                                });
+                                                                console.log('Clean up media had failed.')
+                                                            }
+                                                        })
+                                                        .catch((error) => {
+                                                            console.error('Error:', error);
+                                                        });
+                                                    checkUpload = true;
+                                                }
                                             }
                                         }
-                                    }
-                                })
-                                .catch((error) => {
-                                    console.error('Error:', error);
-                                });
-                            this.selectedItems = this.selection;
-                        }
-                        this.$emit('media-selection-change', this.selectedItems);
+                                    })
+                                    .catch((error) => {
+                                        console.error('Error:', error);
+                                    });
+                                this.selectedItems = this.selection;
+                            }
+                            this.$emit('media-selection-change', this.selectedItems);
 
-                        await this.sleep(500);
-                        let modalElement = document.querySelector('.sw-modal.sw-media-modal-v2.sw-modal--full');
-                        modalElement.querySelector('.sw-button.sw-button--primary').click();
+                            await this.sleep(500);
+                            let modalElement = document.querySelector('.sw-modal.sw-media-modal-v2.sw-modal--full');
+                            modalElement.querySelector('.sw-button.sw-button--primary').click();
+                        } else {
+                            this.createNotificationError({
+                                title: this.$tc('global.default.error'),
+                                message: "Can't get admin auth token. Please check again your plugin configuration."
+                            });
+                            console.log("Can't get admin auth token. Please check again your plugin configuration.");
+                        }
+
                     })
                     .on('complete', ({failed, uploadID, successful}) => {
                         if (failed) {
@@ -368,6 +392,10 @@ Component.register('sw-filerobot-library', {
                     window.history.pushState(null, document.title, current_url);
                 }, 1000);
             } else {
+                this.createNotificationError({
+                    title: this.$tc('global.default.error'),
+                    message: "Filerobot is unauthorized."
+                });
                 console.log('Filerobot is unauthorized.');
             }
         },
