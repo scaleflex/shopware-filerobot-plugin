@@ -271,109 +271,108 @@ Component.register('sw-filerobot-library', {
                                 "grant_type": "client_credentials"
                             })
                         }).then((response) => response.json())
-                            .then((data) => {
+                            .then(async (data) => {
                                 if (data.access_token !== undefined && data.access_token !== '') {
                                     this.adminAuthToken = data.access_token;
+                                }
+
+                                if (this.adminAuthToken !== null) {
+                                    for (const selected of files) {
+                                        /**
+                                         * Check media by uuid
+                                         * @type {string}
+                                         */
+                                        let checkURL = window.location.origin + '/api/scaleflex/filerobot/check-filerobot-uuid-exist';
+                                        await fetch(checkURL, {
+                                            method: 'POST',
+                                            timeout: 30,
+                                            headers: {
+                                                'Content-Type': 'application/json; charset=utf-8',
+                                                'Authorization': 'Bearer ' + this.adminAuthToken
+                                            },
+                                            body: JSON.stringify({
+                                                "filerobot_uuid": selected.file.uuid
+                                            })
+                                        }).then((response) => response.json())
+                                            .then(async (data) => {
+                                                let media = null;
+                                                if (data !== false) {
+                                                    let media_id = data[0].toLowerCase();
+                                                    let media = await this.mediaRepository.get(media_id, Context.api);
+                                                    this.selection.push(media);
+                                                } else {
+                                                    /**
+                                                     * Upload to shopware with FR url
+                                                     */
+                                                    let url = new URL(selected.link);
+                                                    let fileExtension = selected.file.extension;
+                                                    let media_id = await this.onUrlUpload({url, fileExtension});
+
+                                                    /**
+                                                     * Waiting while shopware doing upload
+                                                     */
+                                                    let checkUpload = false;
+                                                    while (!checkUpload) {
+                                                        await this.sleep(500);
+                                                        media = await this.mediaRepository.get(media_id, Context.api);
+                                                        if (media.uploadedAt !== null) {
+                                                            let mediaURL = media.url;
+                                                            let mediaPath = mediaURL.replace(window.location.origin, '');
+                                                            let deleteURL = window.location.origin + '/api/scaleflex/filerobot/clean-up-media';
+                                                            let filerobotURL = selected.file.url.cdn;
+                                                            filerobotURL = filerobotURL.split('?')[0];
+                                                            fetch(deleteURL, {
+                                                                method: 'POST',
+                                                                timeout: 30,
+                                                                headers: {
+                                                                    'Content-Type': 'application/json; charset=utf-8',
+                                                                    'Authorization': 'Bearer ' + this.adminAuthToken
+                                                                },
+                                                                body: JSON.stringify({
+                                                                    "media_id": media_id,
+                                                                    "filerobot_url": filerobotURL,
+                                                                    "filerobot_uuid": selected.file.uuid,
+                                                                    "media_path": mediaPath
+                                                                })
+                                                            }).then((response) => response.json())
+                                                                .then((data) => {
+                                                                    if (!data) {
+                                                                        this.createNotificationError({
+                                                                            title: this.$tc('global.default.error'),
+                                                                            message: "Clean up media had failed."
+                                                                        });
+                                                                        console.log('Clean up media had failed.')
+                                                                    }
+                                                                })
+                                                                .catch((error) => {
+                                                                    console.error('Error:', error);
+                                                                });
+                                                            checkUpload = true;
+                                                        }
+                                                    }
+                                                }
+                                            })
+                                            .catch((error) => {
+                                                console.error('Error:', error);
+                                            });
+                                        this.selectedItems = this.selection;
+                                    }
+                                    this.$emit('media-selection-change', this.selectedItems);
+
+                                    await this.sleep(500);
+                                    let modalElement = document.querySelector('.sw-modal.sw-media-modal-v2.sw-modal--full');
+                                    modalElement.querySelector('.sw-button.sw-button--primary').click();
+                                } else {
+                                    this.createNotificationError({
+                                        title: this.$tc('global.default.error'),
+                                        message: "Can't get admin auth token. Please check again your plugin configuration."
+                                    });
+                                    console.log("Can't get admin auth token. Please check again your plugin configuration.");
                                 }
                             })
                             .catch((error) => {
                                 console.error('Error:', error);
                             });
-
-                        if (this.adminAuthToken !== null) {
-                            for (const selected of files) {
-                                /**
-                                 * Check media by uuid
-                                 * @type {string}
-                                 */
-                                let checkURL = window.location.origin + '/api/scaleflex/filerobot/check-filerobot-uuid-exist';
-                                await fetch(checkURL, {
-                                    method: 'POST',
-                                    timeout: 30,
-                                    headers: {
-                                        'Content-Type': 'application/json; charset=utf-8',
-                                        'Authorization': 'Bearer ' + this.adminAuthToken
-                                    },
-                                    body: JSON.stringify({
-                                        "filerobot_uuid": selected.file.uuid
-                                    })
-                                }).then((response) => response.json())
-                                    .then(async (data) => {
-                                        let media = null;
-                                        if (data !== false) {
-                                            let media_id = data[0].toLowerCase();
-                                            let media = await this.mediaRepository.get(media_id, Context.api);
-                                            this.selection.push(media);
-                                        } else {
-                                            /**
-                                             * Upload to shopware with FR url
-                                             */
-                                            let url = new URL(selected.link);
-                                            let fileExtension = selected.file.extension;
-                                            let media_id = await this.onUrlUpload({url, fileExtension});
-
-                                            /**
-                                             * Waiting while shopware doing upload
-                                             */
-                                            let checkUpload = false;
-                                            while (!checkUpload) {
-                                                await this.sleep(500);
-                                                media = await this.mediaRepository.get(media_id, Context.api);
-                                                if (media.uploadedAt !== null) {
-                                                    let mediaURL = media.url;
-                                                    let mediaPath = mediaURL.replace(window.location.origin, '');
-                                                    let deleteURL = window.location.origin + '/api/scaleflex/filerobot/clean-up-media';
-                                                    let filerobotURL = selected.file.url.cdn;
-                                                    filerobotURL = filerobotURL.split('?')[0];
-                                                    fetch(deleteURL, {
-                                                        method: 'POST',
-                                                        timeout: 30,
-                                                        headers: {
-                                                            'Content-Type': 'application/json; charset=utf-8',
-                                                            'Authorization': 'Bearer ' + this.adminAuthToken
-                                                        },
-                                                        body: JSON.stringify({
-                                                            "media_id": media_id,
-                                                            "filerobot_url": filerobotURL,
-                                                            "filerobot_uuid": selected.file.uuid,
-                                                            "media_path": mediaPath
-                                                        })
-                                                    }).then((response) => response.json())
-                                                        .then((data) => {
-                                                            if (!data) {
-                                                                this.createNotificationError({
-                                                                    title: this.$tc('global.default.error'),
-                                                                    message: "Clean up media had failed."
-                                                                });
-                                                                console.log('Clean up media had failed.')
-                                                            }
-                                                        })
-                                                        .catch((error) => {
-                                                            console.error('Error:', error);
-                                                        });
-                                                    checkUpload = true;
-                                                }
-                                            }
-                                        }
-                                    })
-                                    .catch((error) => {
-                                        console.error('Error:', error);
-                                    });
-                                this.selectedItems = this.selection;
-                            }
-                            this.$emit('media-selection-change', this.selectedItems);
-
-                            await this.sleep(500);
-                            let modalElement = document.querySelector('.sw-modal.sw-media-modal-v2.sw-modal--full');
-                            modalElement.querySelector('.sw-button.sw-button--primary').click();
-                        } else {
-                            this.createNotificationError({
-                                title: this.$tc('global.default.error'),
-                                message: "Can't get admin auth token. Please check again your plugin configuration."
-                            });
-                            console.log("Can't get admin auth token. Please check again your plugin configuration.");
-                        }
-
                     })
                     .on('complete', ({failed, uploadID, successful}) => {
                         if (failed) {
