@@ -90,4 +90,12 @@
             <defaultValue>/wp_assets</defaultValue>
         </input-field>
     </card>
+
+    <card>
+        <component name="filerobot-api-test-button">
+            <name>frTestButton</name>
+            <label>Verify Filerobot Token</label>
+            <label lang="de-DE">Verify Filerobot Token</label>
+        </component>
+    </card>
 </config>

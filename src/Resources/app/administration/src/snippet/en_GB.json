@@ -1,0 +1,8 @@
+{
+    "filerobot-api-test-button": {
+        "title": "Filerobot test connection",
+        "success": "Connection was successfully tested.",
+        "error": "Connection could not be established. Please check the access data",
+        "button": "Test connection"
+    }
+}

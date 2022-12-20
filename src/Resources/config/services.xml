@@ -10,12 +10,12 @@
         <service id="Scaleflex\Filerobot\Subscriber\MediaSubscriber">
             <tag name="kernel.event_subscriber"/>
         </service>
-        <service id="Scaleflex\Filerobot\Controller\Api\CheckMediaExistApiController" public="true">
+        <service id="Scaleflex\Filerobot\Controller\Api\CheckFilerobotUuidExistApiController" public="true">
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
         </service>
-        <service id="Scaleflex\Filerobot\Controller\Api\CheckFilerobotUuidExistApiController" public="true">
+        <service id="Scaleflex\Filerobot\Controller\Api\ApiTestController" public="true">
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
