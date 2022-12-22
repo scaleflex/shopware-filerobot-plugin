@@ -227,9 +227,17 @@ Component.register('sw-filerobot-library', {
 
                 let filerobot = null;
 
+                // Locale
+                const locales = Filerobot.locales;
+                let defaultLocale = 'EN';
+                if (this.$tc('widget-locale.locale') !== '') {
+                    defaultLocale = this.$tc('widget-locale.locale');
+                }
+
                 filerobot = Filerobot.Core({
                     securityTemplateID: this.frSEC,
                     container: this.frToken,
+                    locale: locales[defaultLocale]
                 });
 
                 // Plugins
@@ -240,20 +248,20 @@ Component.register('sw-filerobot-library', {
                 var ImageEditor = Filerobot.ImageEditor;
                 var Webcam = Filerobot.Webcam;
 
+                // Language
+
                 filerobot
                     .use(Explorer, {
                         config: {
-                            rootFolderPath: this.frUploadDirectory
+                            rootFolderPath: this.frUploadDirectory,
+                            tagging: {
+                                language: 'en',
+                            }
                         },
                         target: '#filerobot-widget',
                         inline: true,
                         width: 10000,
-                        height: 1000,
-                        locale: {
-                            strings: {
-                                export: 'Insert from FMAW into page'
-                            }
-                        },
+                        height: 1000
                     })
                     .use(XHRUpload)
                     .on('export', async (files, popupExportSuccessMsgFn, downloadFilesPackagedFn, downloadFileFn) => {

@@ -1,8 +1,11 @@
 {
     "filerobot-api-test-button": {
-        "title": "Filerobot test connection",
-        "success": "Connection was successfully tested.",
-        "error": "Connection could not be established. Please check the access data",
-        "button": "Test connection"
+        "title": "Testverbindung von/zu Filerobot",
+        "success": "Verbindung wurde erfolgreich getestet.",
+        "error": "Verbindung konnte nicht hergestellt werden. Bitte überprüfen Sie die Zugangsdaten.",
+        "button": "Verbindung wird getestet"
+    },
+    "widget-locale": {
+        "locale": "DE"
     }
 }
