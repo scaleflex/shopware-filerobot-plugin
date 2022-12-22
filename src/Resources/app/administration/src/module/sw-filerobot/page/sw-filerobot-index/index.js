@@ -71,7 +71,7 @@ Component.register('sw-filerobot-index', {
 
     mounted() {
         let filerobotScript = document.createElement('script');
-        filerobotScript.setAttribute('src', 'https://cdn.scaleflex.it/plugins/filerobot-widget/1.0.105/filerobot-widget.min.js');
+        filerobotScript.setAttribute('src', 'https://cdn.scaleflex.it/plugins/filerobot-widget/1.0.106/filerobot-widget.min.js');
         document.head.appendChild(filerobotScript);
     },
 
@@ -168,9 +168,17 @@ Component.register('sw-filerobot-index', {
 
                 let filerobot = null;
 
+                // Locale
+                const locales = Filerobot.locales;
+                let defaultLocale = 'EN';
+                if (this.$tc('widget-locale.locale') !== '') {
+                    defaultLocale = this.$tc('widget-locale.locale');
+                }
+
                 filerobot = Filerobot.Core({
                     securityTemplateID: this.frSEC,
                     container: this.frToken,
+                    locale: locales[defaultLocale]
                 });
 
                 // Plugins
@@ -190,13 +198,9 @@ Component.register('sw-filerobot-index', {
                         inline: true,
                         width: 10000,
                         height: 1000,
-                        disableExportButton: true,
-                        locale: {
-                            strings: {
-                                export: 'Insert from FMAW into page'
-                            }
-                        },
+                        disableExportButton: true
                     })
+                    .use(ImageEditor)
                     .use(XHRUpload)
                     .on('export', async (files, popupExportSuccessMsgFn, downloadFilesPackagedFn, downloadFileFn) => {
 

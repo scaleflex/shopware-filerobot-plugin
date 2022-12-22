@@ -98,7 +98,7 @@ Component.register('sw-filerobot-library', {
 
     mounted() {
         let filerobotScript = document.createElement('script');
-        filerobotScript.setAttribute('src', 'https://cdn.scaleflex.it/plugins/filerobot-widget/1.0.105/filerobot-widget.min.js');
+        filerobotScript.setAttribute('src', 'https://cdn.scaleflex.it/plugins/filerobot-widget/1.0.106/filerobot-widget.min.js');
         document.head.appendChild(filerobotScript);
     },
 
@@ -248,15 +248,10 @@ Component.register('sw-filerobot-library', {
                 var ImageEditor = Filerobot.ImageEditor;
                 var Webcam = Filerobot.Webcam;
 
-                // Language
-
                 filerobot
                     .use(Explorer, {
                         config: {
-                            rootFolderPath: this.frUploadDirectory,
-                            tagging: {
-                                language: 'en',
-                            }
+                            rootFolderPath: this.frUploadDirectory
                         },
                         target: '#filerobot-widget',
                         inline: true,
@@ -264,6 +259,7 @@ Component.register('sw-filerobot-library', {
                         height: 1000
                     })
                     .use(XHRUpload)
+                    .use(ImageEditor)
                     .on('export', async (files, popupExportSuccessMsgFn, downloadFilesPackagedFn, downloadFileFn) => {
                         // console.dir(files);
                         let oauthURL = window.location.origin + '/api/oauth/token';
