@@ -3,7 +3,6 @@
 namespace Scaleflex\Filerobot\Controller\Api;
 
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
-use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,9 +18,11 @@ class ApiTestController extends AbstractController
      */
     public function check(Request $request): JsonResponse
     {
+        /**
+         * Verify Filerobot Token
+         */
         $frSEC = $request->get('ScaleflexFilerobot.config.frSEC');
         $frToken = $request->get('ScaleflexFilerobot.config.frToken');
-//        $path = $dataBag->get('ScaleflexFilerobot.config.frUploadDirectory');
 
         $endPoint = 'https://api.filerobot.com/' . $frToken . '/key/' . $frSEC;
         $success = false;
@@ -41,6 +42,57 @@ class ApiTestController extends AbstractController
             }
         }
 
-        return new JsonResponse(['success' => $success]);
+        if (!$success) {
+            return new JsonResponse(
+                [
+                    'success' => false,
+                    'message' => 'failToVerifyFilerobotToken'
+                ]
+            );
+        }
+
+        /**
+         * Verify Admin Auth Token
+         */
+        $frAdminAccessKeyID = $request->get('ScaleflexFilerobot.config.frAdminAccessKeyID');
+        $frAdminSecretAccessKey = $request->get('ScaleflexFilerobot.config.frAdminSecretAccessKey');
+
+        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+        $domainName = $_SERVER['HTTP_HOST'];
+        $url = $protocol . $domainName;
+
+        $authUrl = $url . '/api/oauth/token';
+        $postData = [
+            'client_id' => $frAdminAccessKeyID,
+            'client_secret' => $frAdminSecretAccessKey,
+            'grant_type'   => "client_credentials"
+        ];
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $authUrl);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        // Receive server response ...
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+        $response = curl_exec($ch);
+        curl_close ($ch);
+        $result = json_decode($response, true);
+
+        if (isset($result['access_token']) && $result['access_token'] != '') {
+            $success = true;
+        } else {
+            $success = false;
+        }
+
+        if (!$success) {
+            return new JsonResponse(
+                [
+                    'success' => false,
+                    'message' => 'failToVerifyAdminAuthToken'
+                ]
+            );
+        }
+
+        return new JsonResponse(['success' => true]);
     }
 }

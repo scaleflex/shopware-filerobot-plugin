@@ -47,7 +47,7 @@ Component.register('filerobot-api-test-button', {
                 } else {
                     this.createNotificationError({
                         title: this.$tc('filerobot-api-test-button.title'),
-                        message: this.$tc('filerobot-api-test-button.error')
+                        message: this.$tc('filerobot-api-test-button.errors.' + res.message)
                     });
                 }
 

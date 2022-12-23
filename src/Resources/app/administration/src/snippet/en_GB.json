@@ -2,7 +2,10 @@
     "filerobot-api-test-button": {
         "title": "Filerobot test connection",
         "success": "Connection was successfully tested.",
-        "error": "Connection could not be established. Please check the access data",
+        "errors": {
+            "failToVerifyFilerobotToken": "Connection could not be established. Please check again Filerobot Token and Security Template Identifier.",
+            "failToVerifyAdminAuthToken": "Connection could not be established. Please check again Admin access key ID and Admin secret access key."
+        },
         "button": "Test connection"
     },
     "widget-locale": {

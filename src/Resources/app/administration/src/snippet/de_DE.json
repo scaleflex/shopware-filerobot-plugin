@@ -2,7 +2,10 @@
     "filerobot-api-test-button": {
         "title": "Testverbindung von/zu Filerobot",
         "success": "Verbindung wurde erfolgreich getestet.",
-        "error": "Verbindung konnte nicht hergestellt werden. Bitte überprüfen Sie die Zugangsdaten.",
+        "errors": {
+            "failToVerifyFilerobotToken": "Verbindung konnte nicht hergestellt werden. Bitte überprüfen Sie noch einmal Filerobot Token und Identifikator der Sicherheitsvorlage.",
+            "failToVerifyAdminAuthToken": "Verbindung konnte nicht hergestellt werden. Bitte überprüfen Sie noch einmal Admin-Zugangsschlüssel ID und Geheimer Admin-Zugangsschlüssel."
+        },
         "button": "Verbindung wird getestet"
     },
     "widget-locale": {
