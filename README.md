@@ -27,5 +27,6 @@
 - **Filerobot upload directory:** The directory in your Filerobot account, where the files will be stored.
 
 ####  The step to get **"Admin access key ID"** and **"Admin secret access key"**:
+![](docs/go-to-setting.png)
 ![](docs/admin-key-1.png)
 ![](docs/admin-key-2.png)

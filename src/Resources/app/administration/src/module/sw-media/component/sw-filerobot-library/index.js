@@ -98,7 +98,7 @@ Component.register('sw-filerobot-library', {
 
     mounted() {
         let filerobotScript = document.createElement('script');
-        filerobotScript.setAttribute('src', 'https://cdn.scaleflex.it/plugins/filerobot-widget/1.0.106/filerobot-widget.min.js');
+        filerobotScript.setAttribute('src', 'https://cdn.scaleflex.it/plugins/filerobot-widget/1.0.107/filerobot-widget.min.js');
         document.head.appendChild(filerobotScript);
     },
 
