@@ -71,7 +71,7 @@ Component.register('sw-filerobot-index', {
 
     mounted() {
         let filerobotScript = document.createElement('script');
-        filerobotScript.setAttribute('src', 'https://cdn.scaleflex.it/plugins/filerobot-widget/1.0.107/filerobot-widget.min.js');
+        filerobotScript.setAttribute('src', 'https://cdn.scaleflex.it/plugins/filerobot-widget/latest/filerobot-widget.min.js');
         document.head.appendChild(filerobotScript);
     },
 
@@ -174,11 +174,13 @@ Component.register('sw-filerobot-index', {
                 if (this.$tc('widget-locale.locale') !== '') {
                     defaultLocale = this.$tc('widget-locale.locale');
                 }
+                locales[defaultLocale].strings.download = this.$tc('widget-locale.button.export');
 
                 filerobot = Filerobot.Core({
                     securityTemplateID: this.frSEC,
                     container: this.frToken,
-                    locale: locales[defaultLocale]
+                    locale: locales[defaultLocale],
+                    language: defaultLocale.toLowerCase()
                 });
 
                 // Plugins
@@ -198,7 +200,10 @@ Component.register('sw-filerobot-index', {
                         inline: true,
                         width: 10000,
                         height: 1000,
-                        disableExportButton: true
+                        disableExportButton: true,
+                        disableTopBarMainButton: true,
+                        hideExportButtonIcon: true,
+                        preventExportDefaultBehavior: true
                     })
                     .use(ImageEditor)
                     .use(XHRUpload)

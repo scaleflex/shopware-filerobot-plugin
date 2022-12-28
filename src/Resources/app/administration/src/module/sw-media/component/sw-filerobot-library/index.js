@@ -98,7 +98,8 @@ Component.register('sw-filerobot-library', {
 
     mounted() {
         let filerobotScript = document.createElement('script');
-        filerobotScript.setAttribute('src', 'https://cdn.scaleflex.it/plugins/filerobot-widget/1.0.107/filerobot-widget.min.js');
+        filerobotScript.setAttribute('src', 'https://cdn.scaleflex.it/plugins/filerobot-widget/latest/filerobot-widget.min.js');
+        filerobotScript.setAttribute('async', 'true');
         document.head.appendChild(filerobotScript);
     },
 
@@ -221,8 +222,10 @@ Component.register('sw-filerobot-library', {
                 let swMediaFooterElement = document.getElementsByClassName("sw-modal__footer");
                 swMediaFooterElement[0].style.display = 'none';
 
+                //wait library loaded
+                await this.sleep(300);
                 if (!Filerobot) {
-                    var Filerobot = window.Filerobot;
+                    let Filerobot = window.Filerobot;
                 }
 
                 let filerobot = null;
@@ -237,7 +240,8 @@ Component.register('sw-filerobot-library', {
                 filerobot = Filerobot.Core({
                     securityTemplateID: this.frSEC,
                     container: this.frToken,
-                    locale: locales[defaultLocale]
+                    locale: locales[defaultLocale],
+                    language: defaultLocale.toLowerCase()
                 });
 
                 // Plugins
@@ -256,7 +260,16 @@ Component.register('sw-filerobot-library', {
                         target: '#filerobot-widget',
                         inline: true,
                         width: 10000,
-                        height: 1000
+                        height: 1000,
+                        disableExportButton: true,
+                        hideExportButtonIcon: true,
+                        preventExportDefaultBehavior: true,
+                        locale: {
+                            strings: {
+                                mutualizedExportButtonLabel: this.$tc('widget-locale.button.export'),
+                                mutualizedDownloadButton: this.$tc('widget-locale.button.export')
+                            }
+                        },
                     })
                     .use(XHRUpload)
                     .use(ImageEditor)

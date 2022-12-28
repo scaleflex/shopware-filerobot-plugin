@@ -9,6 +9,9 @@
         "button": "Test connection"
     },
     "widget-locale": {
-        "locale": "EN"
+        "locale": "EN",
+        "button": {
+            "export": "Export"
+        }
     }
 }
