@@ -101,6 +101,7 @@ class ScaleflexFilerobot extends Plugin
             $connection->executeStatement('DELETE FROM `theme_media` where media_id = UNHEX("' . $media_id . '")');
             $connection->executeStatement('UPDATE `user` SET avatar_id = NULL where avatar_id = UNHEX("' . $media_id . '")');
             $connection->executeStatement('UPDATE `category` SET media_id = NULL where media_id = UNHEX("' . $media_id . '")');
+            $connection->executeStatement('UPDATE `mail_template_media` SET media_id = NULL where media_id = UNHEX("' . $media_id . '")');
         }
         $connection->executeStatement('DELETE FROM `media` where `is_filerobot` = 1');
         $connection->executeStatement("ALTER TABLE `media` DROP COLUMN `is_filerobot`,

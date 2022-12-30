@@ -155,7 +155,7 @@ class CleanUpMediaForFileRobotController extends AbstractController
 
             // insert media_thumbnail
             $mediaThumbnailSizes = $this->connection->fetchAllAssociative(
-                'SELECT HEX(id), width, height, custom_fields FROM media_thumbnail_size'
+                'SELECT width, height FROM media_thumbnail_size'
             );
             if (count($mediaThumbnailSizes)) {
                 foreach ($mediaThumbnailSizes as $mediaThumbnailSize) {
