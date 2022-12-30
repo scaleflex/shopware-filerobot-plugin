@@ -35,7 +35,10 @@ class MediaSubscriber implements EventSubscriberInterface
                 $mediaEntity->setUrl($media['filerobot_url']);
 
                 $mediaThumbnailSizes = $connection->fetchAllAssociative(
-                    'SELECT HEX(id) as id, HEX(media_id) as media_id, width, height, custom_fields FROM media_thumbnail'
+                    'SELECT HEX(id) as id, HEX(media_id) as media_id, width, height, custom_fields 
+                        FROM media_thumbnail 
+                        WHERE media_id = :id',
+                    ['id' => Uuid::fromHexToBytes($id)]
                 );
 
                 if (count($mediaThumbnailSizes)) {

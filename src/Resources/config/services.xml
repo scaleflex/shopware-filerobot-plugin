@@ -4,9 +4,6 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
-        <service id="Scaleflex\Filerobot\Extension\Content\Media\MediaExtension">
-            <tag name="shopware.entity.extension"/>
-        </service>
         <service id="Scaleflex\Filerobot\Subscriber\MediaSubscriber">
             <tag name="kernel.event_subscriber"/>
         </service>
