@@ -57,11 +57,9 @@ class ApiTestController extends AbstractController
         $frAdminAccessKeyID = $request->get('ScaleflexFilerobot.config.frAdminAccessKeyID');
         $frAdminSecretAccessKey = $request->get('ScaleflexFilerobot.config.frAdminSecretAccessKey');
 
-        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
-        $domainName = $_SERVER['HTTP_HOST'];
-        $url = $protocol . $domainName;
-
-        $authUrl = $url . '/api/oauth/token';
+        $urlExplode = $request->getUri();
+        $url = explode('api', $urlExplode)[0];
+        $authUrl = $url . 'api/oauth/token';
         $postData = [
             'client_id' => $frAdminAccessKeyID,
             'client_secret' => $frAdminSecretAccessKey,
@@ -88,7 +86,8 @@ class ApiTestController extends AbstractController
             return new JsonResponse(
                 [
                     'success' => false,
-                    'message' => 'failToVerifyAdminAuthToken'
+                    'message' => 'failToVerifyAdminAuthToken',
+                    'url' => $authUrl
                 ]
             );
         }

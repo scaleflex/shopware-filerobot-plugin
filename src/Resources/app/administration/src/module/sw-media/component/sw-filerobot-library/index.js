@@ -275,7 +275,9 @@ Component.register('sw-filerobot-library', {
                     .use(ImageEditor)
                     .on('export', async (files, popupExportSuccessMsgFn, downloadFilesPackagedFn, downloadFileFn) => {
                         // console.dir(files);
-                        let oauthURL = window.location.origin + '/api/oauth/token';
+                        let currentUrl = window.location.href;
+                        let domainUrl = currentUrl.split("admin#")[0];
+                        let oauthURL = domainUrl + 'api/oauth/token';
                         fetch(oauthURL, {
                             method: 'POST',
                             timeout: 30,
@@ -304,7 +306,7 @@ Component.register('sw-filerobot-library', {
                                          * Check media by uuid
                                          * @type {string}
                                          */
-                                        let checkURL = window.location.origin + '/api/scaleflex/filerobot/check-filerobot-uuid-exist';
+                                        let checkURL = domainUrl + 'api/scaleflex/filerobot/check-filerobot-uuid-exist';
                                         await fetch(checkURL, {
                                             method: 'POST',
                                             timeout: 30,
@@ -339,8 +341,8 @@ Component.register('sw-filerobot-library', {
                                                         media = await this.mediaRepository.get(media_id, Context.api);
                                                         if (media.uploadedAt !== null) {
                                                             let mediaURL = media.url;
-                                                            let mediaPath = mediaURL.replace(window.location.origin, '');
-                                                            let deleteURL = window.location.origin + '/api/scaleflex/filerobot/clean-up-media';
+                                                            let mediaPath = mediaURL.replace(domainUrl, '');
+                                                            let deleteURL = domainUrl + 'api/scaleflex/filerobot/clean-up-media';
                                                             let filerobotURL = selected.file.url.cdn;
                                                             filerobotURL = filerobotURL.split('?')[0];
                                                             fetch(deleteURL, {
@@ -354,7 +356,7 @@ Component.register('sw-filerobot-library', {
                                                                     "media_id": media_id,
                                                                     "filerobot_url": filerobotURL,
                                                                     "filerobot_uuid": selected.file.uuid,
-                                                                    "media_path": mediaPath
+                                                                    "media_path": '/' + mediaPath
                                                                 })
                                                             }).then((response) => response.json())
                                                                 .then((data) => {

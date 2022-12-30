@@ -35,14 +35,14 @@ class MediaSubscriber implements EventSubscriberInterface
                 $mediaEntity->setUrl($media['filerobot_url']);
 
                 $mediaThumbnailSizes = $connection->fetchAllAssociative(
-                    'SELECT HEX(id), width, height, custom_fields FROM media_thumbnail_size'
+                    'SELECT HEX(id) as id, HEX(media_id) as media_id, width, height, custom_fields FROM media_thumbnail'
                 );
 
                 if (count($mediaThumbnailSizes)) {
                     $mediaThumbnailCollectionArray = [];
                     foreach ($mediaThumbnailSizes as $mediaThumbnailSize) {
                         $thumbnailEntity = new MediaThumbnailEntity();
-                        $thumbnailEntity->setId(Uuid::randomHex());
+                        $thumbnailEntity->setId(strtolower($mediaThumbnailSize['id']));
                         $thumbnailEntity->setHeight((int)$mediaThumbnailSize['height']);
                         $thumbnailEntity->setWidth((int)$mediaThumbnailSize['width']);
                         $thumbnailEntity->setUrl($media['filerobot_url'] . '?w=' . $mediaThumbnailSize['width']);

@@ -97,6 +97,10 @@ class ScaleflexFilerobot extends Plugin
             $connection->executeStatement('DELETE FROM `media_tag` where media_id = UNHEX("' . $media_id . '")');
             $connection->executeStatement('DELETE FROM `media_thumbnail` where media_id = UNHEX("' . $media_id . '")');
             $connection->executeStatement('DELETE FROM `media_translation` where media_id = UNHEX("' . $media_id . '")');
+            $connection->executeStatement('DELETE FROM `product_media` where media_id = UNHEX("' . $media_id . '")');
+            $connection->executeStatement('DELETE FROM `theme_media` where media_id = UNHEX("' . $media_id . '")');
+            $connection->executeStatement('UPDATE `user` SET avatar_id = NULL where avatar_id = UNHEX("' . $media_id . '")');
+            $connection->executeStatement('UPDATE `category` SET media_id = NULL where media_id = UNHEX("' . $media_id . '")');
         }
         $connection->executeStatement('DELETE FROM `media` where `is_filerobot` = 1');
         $connection->executeStatement("ALTER TABLE `media` DROP COLUMN `is_filerobot`,
@@ -104,7 +108,7 @@ class ScaleflexFilerobot extends Plugin
         DROP COLUMN `filerobot_uuid`;");
 
         //remove folder "Filerobot"
-        $connection->executeStatement("DELETE FROM `media_default_folder` where `association_fields` = '[\"filerobotMedia\"]'");
+        $connection->executeStatement("DELETE FROM `media_default_folder` where `entity` = 'filerobot'");
         $connection->executeStatement("DELETE FROM `media_folder` where `name` = 'Filerobot DAM'");
     }
 

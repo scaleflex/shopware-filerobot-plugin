@@ -6,6 +6,7 @@ use Shopware\Core\Content\Media\MediaEntity;
 use Shopware\Core\Content\Media\Pathname\PathnameStrategy\FilenamePathnameStrategy;
 use Scaleflex\Filerobot\Extension\Content\Media\Pathname\UrlGeneratorExtension;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\Kernel;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Shopware\Core\Framework\Api\Controller\ApiController;
@@ -145,12 +146,30 @@ class CleanUpMediaForFileRobotController extends AbstractController
     {
         try {
             $query = "UPDATE media
-                        SET 
-                            filerobot_url = '" . $this->processedMedia['filerobot_url'] . "',
-                            is_filerobot = 1,
-                            filerobot_uuid = '" . $this->processedMedia['filerobot_uuid'] . "'
-                        WHERE id = UNHEX('" . $this->processedMedia['media_id'] . "')";
+            SET 
+                filerobot_url = '" . $this->processedMedia['filerobot_url'] . "',
+                is_filerobot = 1,
+                filerobot_uuid = '" . $this->processedMedia['filerobot_uuid'] . "'
+            WHERE id = UNHEX('" . $this->processedMedia['media_id'] . "')";
             $this->connection->executeStatement($query);
+
+            // insert media_thumbnail
+            $mediaThumbnailSizes = $this->connection->fetchAllAssociative(
+                'SELECT HEX(id), width, height, custom_fields FROM media_thumbnail_size'
+            );
+            if (count($mediaThumbnailSizes)) {
+                foreach ($mediaThumbnailSizes as $mediaThumbnailSize) {
+                    $created_at = date('Y-m-d H:i:s');
+                    $query = "INSERT INTO media_thumbnail (`id`, `media_id`, `width`, `height`, `created_at`) 
+                        VALUES (
+                            UNHEX('" . Uuid::randomHex() . "'),
+                            UNHEX('" . $this->processedMedia['media_id'] . "'),
+                            '" . (int)$mediaThumbnailSize['width'] . "', 
+                            '" . (int)$mediaThumbnailSize['height'] . "', 
+                            '" . $created_at . "');";
+                    $this->connection->executeStatement($query);
+                }
+            }
         } catch (\Exception $exception) {
             throw new \Exception($exception->getMessage());
         }
