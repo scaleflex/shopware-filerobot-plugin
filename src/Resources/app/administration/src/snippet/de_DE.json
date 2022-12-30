@@ -3,8 +3,8 @@
         "title": "Testverbindung von/zu Filerobot",
         "success": "Verbindung wurde erfolgreich getestet.",
         "errors": {
-            "failToVerifyFilerobotToken": "Verbindung konnte nicht hergestellt werden. Bitte überprüfen Sie noch einmal Filerobot Token und Identifikator der Sicherheitsvorlage.",
-            "failToVerifyAdminAuthToken": "Verbindung konnte nicht hergestellt werden. Bitte überprüfen Sie noch einmal Admin-Zugangsschlüssel ID und Geheimer Admin-Zugangsschlüssel."
+            "failToVerifyFilerobotToken": "Die Verbindung konnte nicht hergestellt werden. Bitte überprüfen Sie Filerobot Token und Security Template Identifier.",
+            "failToVerifyAdminAuthToken": "Verbindung konnte nicht hergestellt werden. Bitte überprüfen Sie Admin-Zugriffsschlüssel-ID und geheimen Admin-Zugriffsschlüssel."
         },
         "button": "Verbindung wird getestet"
     },
