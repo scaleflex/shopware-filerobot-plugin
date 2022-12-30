@@ -389,6 +389,7 @@ Component.register('sw-filerobot-library', {
                                                     frFooterButton[i].removeAttribute('disabled');
                                                 }
                                             });
+                                        this.selection[this.selection.length - 1].url = selected.file.url.cdn;
                                         this.selectedItems = this.selection;
                                     }
                                     this.$emit('media-selection-change', this.selectedItems);
