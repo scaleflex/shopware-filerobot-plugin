@@ -152,24 +152,6 @@ class CleanUpMediaForFileRobotController extends AbstractController
                 filerobot_uuid = '" . $this->processedMedia['filerobot_uuid'] . "'
             WHERE id = UNHEX('" . $this->processedMedia['media_id'] . "')";
             $this->connection->executeStatement($query);
-
-            // insert media_thumbnail
-            $mediaThumbnailSizes = $this->connection->fetchAllAssociative(
-                'SELECT width, height FROM media_thumbnail_size'
-            );
-            if (count($mediaThumbnailSizes)) {
-                foreach ($mediaThumbnailSizes as $mediaThumbnailSize) {
-                    $created_at = date('Y-m-d H:i:s');
-                    $query = "INSERT INTO media_thumbnail (`id`, `media_id`, `width`, `height`, `created_at`) 
-                        VALUES (
-                            UNHEX('" . Uuid::randomHex() . "'),
-                            UNHEX('" . $this->processedMedia['media_id'] . "'),
-                            '" . (int)$mediaThumbnailSize['width'] . "', 
-                            '" . (int)$mediaThumbnailSize['height'] . "', 
-                            '" . $created_at . "');";
-                    $this->connection->executeStatement($query);
-                }
-            }
         } catch (\Exception $exception) {
             throw new \Exception($exception->getMessage());
         }

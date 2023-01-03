@@ -2,7 +2,6 @@
 
 namespace Scaleflex\Filerobot\Subscriber;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Shopware\Core\Content\Media\Aggregate\MediaThumbnail\MediaThumbnailCollection;
 use Shopware\Core\Content\Media\Aggregate\MediaThumbnail\MediaThumbnailEntity;
 use Shopware\Core\Content\Media\MediaEntity;
@@ -23,6 +22,13 @@ class MediaSubscriber implements EventSubscriberInterface
 
     public function onMediasLoaded(EntityLoadedEvent $event): void
     {
+        $context = (array)$event->getContext()->getSource();
+        $isAdmin = false;
+        foreach ($context as $key => $value) {
+            if (strpos($key,'isAdmin')) {
+                $isAdmin = true;
+            }
+        }
         /** @var MediaEntity $mediaEntity */
         foreach ($event->getEntities() as $mediaEntity) {
             $id = $mediaEntity->getId();
@@ -34,25 +40,23 @@ class MediaSubscriber implements EventSubscriberInterface
             if ($media['is_filerobot']) {
                 $mediaEntity->setUrl($media['filerobot_url']);
 
-                $mediaThumbnailSizes = $connection->fetchAllAssociative(
-                    'SELECT HEX(id) as id, HEX(media_id) as media_id, width, height, custom_fields 
-                        FROM media_thumbnail 
-                        WHERE media_id = :id',
-                    ['id' => Uuid::fromHexToBytes($id)]
-                );
-
-                if (count($mediaThumbnailSizes)) {
-                    $mediaThumbnailCollectionArray = [];
-                    foreach ($mediaThumbnailSizes as $mediaThumbnailSize) {
-                        $thumbnailEntity = new MediaThumbnailEntity();
-                        $thumbnailEntity->setId(strtolower($mediaThumbnailSize['id']));
-                        $thumbnailEntity->setHeight((int)$mediaThumbnailSize['height']);
-                        $thumbnailEntity->setWidth((int)$mediaThumbnailSize['width']);
-                        $thumbnailEntity->setUrl($media['filerobot_url'] . '?w=' . $mediaThumbnailSize['width']);
-                        $mediaThumbnailCollectionArray[] = $thumbnailEntity;
+                if (!$isAdmin) {
+                    $mediaThumbnailSizes = $connection->fetchAllAssociative(
+                        'SELECT width, height FROM media_thumbnail_size'
+                    );
+                    if (count($mediaThumbnailSizes)) {
+                        $mediaThumbnailCollectionArray = [];
+                        foreach ($mediaThumbnailSizes as $mediaThumbnailSize) {
+                            $thumbnailEntity = new MediaThumbnailEntity();
+                            $thumbnailEntity->setId(Uuid::randomHex());
+                            $thumbnailEntity->setHeight((int)$mediaThumbnailSize['height']);
+                            $thumbnailEntity->setWidth((int)$mediaThumbnailSize['width']);
+                            $thumbnailEntity->setUrl($media['filerobot_url'] . '?w=' . $mediaThumbnailSize['width']);
+                            $mediaThumbnailCollectionArray[] = $thumbnailEntity;
+                        }
+                        $mediaThumbnailCollection = new MediaThumbnailCollection($mediaThumbnailCollectionArray);
+                        $mediaEntity->setThumbnails($mediaThumbnailCollection);
                     }
-                    $mediaThumbnailCollection = new MediaThumbnailCollection($mediaThumbnailCollectionArray);
-                    $mediaEntity->setThumbnails($mediaThumbnailCollection);
                 }
             }
         }
