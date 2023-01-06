@@ -8,10 +8,19 @@
         },
         "button": "Verbindung wird getestet"
     },
-    "widget-locale": {
+    "frWidgetLocale": {
         "locale": "DE",
         "button": {
-            "export": "Exportieren"
+            "export": "Exportieren",
+            "processing": "Wird bearbeitet"
         }
+    },
+    "frErrors": {
+        "unauthorized": "Filerobot is unauthorized.",
+        "failedToGetKey": "Filerobot has failed to get key.",
+        "tokenOrSEC": "Filerobot token or Security template identifier is empty. Please check again your plugin configuration.",
+        "notActive": "Filerobot is not active. Please check again your plugin configuration.",
+        "cleanMediaFail": "Clean up media had failed.",
+        "adminAuthToken": "Can't get admin auth token. Please check again your plugin configuration."
     }
 }

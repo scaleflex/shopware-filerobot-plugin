@@ -101,6 +101,10 @@ Component.register('sw-filerobot-library', {
         filerobotScript.setAttribute('src', 'https://cdn.scaleflex.it/plugins/filerobot-widget/latest/filerobot-widget.min.js');
         filerobotScript.setAttribute('async', 'true');
         document.head.appendChild(filerobotScript);
+
+        let frScriptDelete = document.createElement('script');
+        frScriptDelete.innerHTML = 'delete Filerobot';
+        document.head.appendChild(frScriptDelete);
     },
 
     computed: {
@@ -169,9 +173,9 @@ Component.register('sw-filerobot-library', {
                             if (sass === '') {
                                 this.createNotificationError({
                                     title: this.$tc('global.default.error'),
-                                    message: "Filerobot has faild to get key."
+                                    message: this.$tc('frErrors.failedToGetKey')
                                 });
-                                console.log('Filerobot has faild to get key.');
+                                console.log(this.$tc('frErrors.failedToGetKey'));
                             } else {
                                 this.frToken = frToken;
                                 this.frSass = sass;
@@ -195,17 +199,17 @@ Component.register('sw-filerobot-library', {
                 } else {
                     this.createNotificationError({
                         title: this.$tc('global.default.error'),
-                        message: "Filerobot token or Security template identifier is empty. Please check again your plugin configuration."
+                        message: this.$tc('frErrors.tokenOrSEC')
                     });
-                    console.log('Filerobot token or Security template identifier is empty. Please check again your plugin configuration.');
+                    console.log(this.$tc('frErrors.tokenOrSEC'));
                     return false;
                 }
             } else {
                 this.createNotificationError({
                     title: this.$tc('global.default.error'),
-                    message: "Filerobot is not active. Please check again your plugin configuration."
+                    message: this.$tc('frErrors.notActive')
                 });
-                console.log('Filerobot is not active. Please check again your plugin configuration.');
+                console.log(this.$tc('frErrors.notActive'));
                 return false;
             }
         },
@@ -214,8 +218,6 @@ Component.register('sw-filerobot-library', {
             if (await this.validToken()) {
                 this.mediaService.addListener(this.uploadTag, this.handleMediaServiceUploadEvent);
 
-                let current_url = window.location.href;
-
                 let swMediaSidebarElement = document.getElementsByClassName("sw-media-sidebar no-headline");
                 swMediaSidebarElement[0].style.display = 'none';
 
@@ -223,18 +225,16 @@ Component.register('sw-filerobot-library', {
                 swMediaFooterElement[0].style.display = 'none';
 
                 //wait library loaded
-                await this.sleep(300);
-                if (!Filerobot) {
-                    let Filerobot = window.Filerobot;
-                }
+                await this.waitFilerobotLibrary();
+                let Filerobot = window.Filerobot;
 
                 let filerobot = null;
 
                 // Locale
                 const locales = Filerobot.locales;
                 let defaultLocale = 'EN';
-                if (this.$tc('widget-locale.locale') !== '') {
-                    defaultLocale = this.$tc('widget-locale.locale');
+                if (this.$tc('frWidgetLocale.locale') !== '') {
+                    defaultLocale = this.$tc('frWidgetLocale.locale');
                 }
 
                 filerobot = Filerobot.Core({
@@ -243,194 +243,13 @@ Component.register('sw-filerobot-library', {
                     locale: locales[defaultLocale],
                     language: defaultLocale.toLowerCase()
                 });
-
-                // Plugins
-                var Explorer = Filerobot.Explorer;
-                var XHRUpload = Filerobot.XHRUpload;
-
-                // Optional plugins:
-                var ImageEditor = Filerobot.ImageEditor;
-                var Webcam = Filerobot.Webcam;
-
-                filerobot
-                    .use(Explorer, {
-                        config: {
-                            rootFolderPath: this.frUploadDirectory
-                        },
-                        target: '#filerobot-widget',
-                        inline: true,
-                        width: 10000,
-                        height: 1000,
-                        disableExportButton: true,
-                        hideExportButtonIcon: true,
-                        preventExportDefaultBehavior: true,
-                        locale: {
-                            strings: {
-                                mutualizedExportButtonLabel: this.$tc('widget-locale.button.export'),
-                                mutualizedDownloadButton: this.$tc('widget-locale.button.export')
-                            }
-                        },
-                    })
-                    .use(XHRUpload)
-                    .use(ImageEditor)
-                    .on('export', async (files, popupExportSuccessMsgFn, downloadFilesPackagedFn, downloadFileFn) => {
-                        // console.dir(files);
-                        let currentUrl = window.location.href;
-                        let domainUrl = currentUrl.split("admin#")[0];
-                        let oauthURL = domainUrl + 'api/oauth/token';
-                        fetch(oauthURL, {
-                            method: 'POST',
-                            timeout: 30,
-                            headers: {
-                                'Content-Type': 'application/json; charset=utf-8',
-                            },
-                            body: JSON.stringify({
-                                "client_id": this.frAdminAccessKeyID,
-                                "client_secret": this.frAdminSecretAccessKey,
-                                "grant_type": "client_credentials"
-                            })
-                        }).then((response) => response.json())
-                            .then(async (data) => {
-                                if (data.access_token !== undefined && data.access_token !== '') {
-                                    this.adminAuthToken = data.access_token;
-                                }
-
-                                let frFooterButton = document.getElementsByClassName("SfxButton-root");
-                                for (let i = 0; i < frFooterButton.length; i++) {
-                                    frFooterButton[i].setAttribute('disabled', 'true');
-                                }
-
-                                if (this.adminAuthToken !== null) {
-                                    for (const selected of files) {
-                                        /**
-                                         * Check media by uuid
-                                         * @type {string}
-                                         */
-                                        let checkURL = domainUrl + 'api/scaleflex/filerobot/check-filerobot-uuid-exist';
-                                        await fetch(checkURL, {
-                                            method: 'POST',
-                                            timeout: 30,
-                                            headers: {
-                                                'Content-Type': 'application/json; charset=utf-8',
-                                                'Authorization': 'Bearer ' + this.adminAuthToken
-                                            },
-                                            body: JSON.stringify({
-                                                "filerobot_uuid": selected.file.uuid
-                                            })
-                                        }).then((response) => response.json())
-                                            .then(async (data) => {
-                                                let media = null;
-                                                if (data !== false) {
-                                                    let media_id = data[0].toLowerCase();
-                                                    let media = await this.mediaRepository.get(media_id, Context.api);
-                                                    this.selection.push(media);
-                                                } else {
-                                                    /**
-                                                     * Upload to shopware with FR url
-                                                     */
-                                                    let url = new URL(selected.link);
-                                                    let fileExtension = selected.file.extension;
-                                                    let media_id = await this.onUrlUpload({url, fileExtension});
-
-                                                    /**
-                                                     * Waiting while shopware doing upload
-                                                     */
-                                                    let checkUpload = false;
-                                                    while (!checkUpload) {
-                                                        await this.sleep(500);
-                                                        media = await this.mediaRepository.get(media_id, Context.api);
-                                                        if (media.uploadedAt !== null) {
-                                                            let mediaURL = media.url;
-                                                            let mediaPath = mediaURL.replace(domainUrl, '');
-                                                            let deleteURL = domainUrl + 'api/scaleflex/filerobot/clean-up-media';
-                                                            let filerobotURL = selected.file.url.cdn;
-                                                            filerobotURL = filerobotURL.split('?')[0];
-                                                            fetch(deleteURL, {
-                                                                method: 'POST',
-                                                                timeout: 30,
-                                                                headers: {
-                                                                    'Content-Type': 'application/json; charset=utf-8',
-                                                                    'Authorization': 'Bearer ' + this.adminAuthToken
-                                                                },
-                                                                body: JSON.stringify({
-                                                                    "media_id": media_id,
-                                                                    "filerobot_url": filerobotURL,
-                                                                    "filerobot_uuid": selected.file.uuid,
-                                                                    "media_path": '/' + mediaPath
-                                                                })
-                                                            }).then((response) => response.json())
-                                                                .then((data) => {
-                                                                    if (!data) {
-                                                                        this.createNotificationError({
-                                                                            title: this.$tc('global.default.error'),
-                                                                            message: "Clean up media had failed."
-                                                                        });
-                                                                        console.log('Clean up media had failed.');
-
-                                                                        for (let i = 0; i < frFooterButton.length; i++) {
-                                                                            frFooterButton[i].removeAttribute('disabled');
-                                                                        }
-                                                                    }
-                                                                })
-                                                                .catch((error) => {
-                                                                    console.error('Error:', error);
-                                                                    for (let i = 0; i < frFooterButton.length; i++) {
-                                                                        frFooterButton[i].removeAttribute('disabled');
-                                                                    }
-                                                                });
-                                                            checkUpload = true;
-                                                        }
-                                                    }
-                                                }
-                                                this.selection[this.selection.length - 1].url = selected.file.url.cdn;
-                                                this.selectedItems = this.selection;
-                                            })
-                                            .catch((error) => {
-                                                console.error('Error:', error);
-                                                for (let i = 0; i < frFooterButton.length; i++) {
-                                                    frFooterButton[i].removeAttribute('disabled');
-                                                }
-                                            });
-                                    }
-                                    this.$emit('media-selection-change', this.selectedItems);
-
-                                    await this.sleep(500);
-                                    let modalElement = document.querySelector('.sw-modal.sw-media-modal-v2.sw-modal--full');
-                                    modalElement.querySelector('.sw-button.sw-button--primary').click();
-                                } else {
-                                    this.createNotificationError({
-                                        title: this.$tc('global.default.error'),
-                                        message: "Can't get admin auth token. Please check again your plugin configuration."
-                                    });
-                                    console.log("Can't get admin auth token. Please check again your plugin configuration.");
-                                }
-                            })
-                            .catch((error) => {
-                                console.error('Error:', error);
-                            });
-                    })
-                    .on('complete', ({failed, uploadID, successful}) => {
-                        if (failed) {
-                            console.dir(failed);
-                        }
-
-                        if (successful) {
-                            // console.dir(successful);
-                            successful.forEach((item, key) => {
-                                // do something
-                            });
-                        }
-                    });
-
-                setTimeout(function () {
-                    window.history.pushState(null, document.title, current_url);
-                }, 1000);
+                this.renderWidget(filerobot);
             } else {
                 this.createNotificationError({
                     title: this.$tc('global.default.error'),
-                    message: "Filerobot is unauthorized."
+                    message: this.$tc('frErrors.unauthorized')
                 });
-                console.log('Filerobot is unauthorized.');
+                console.log(this.$tc('frErrors.unauthorized'));
             }
         },
 
@@ -492,5 +311,236 @@ Component.register('sw-filerobot-library', {
             this.preview = null;
             this.$emit('media-upload-remove-image');
         },
+
+        waitFilerobotLibrary() {
+            return new Promise(function (resolve, reject) {
+                let check = false;
+                while (!check) {
+                    if (window.Filerobot !== undefined) {
+                        check = true;
+                        resolve(true);
+                    }
+                }
+            });
+        },
+
+        renderWidget(filerobot) {
+            let current_url = window.location.href;
+            // Plugins
+            var Explorer = Filerobot.Explorer;
+            var XHRUpload = Filerobot.XHRUpload;
+
+            // Optional plugins:
+            var ImageEditor = Filerobot.ImageEditor;
+            // var Webcam = Filerobot.Webcam;
+
+            filerobot
+                .use(Explorer, {
+                    config: {
+                        rootFolderPath: this.frUploadDirectory
+                    },
+                    target: '#filerobot-widget',
+                    inline: true,
+                    width: 10000,
+                    height: 1000,
+                    disableExportButton: true,
+                    hideExportButtonIcon: true,
+                    preventExportDefaultBehavior: true,
+                    resetAfterClose: true,
+                    locale: {
+                        strings: {
+                            mutualizedExportButtonLabel: this.$tc('frWidgetLocale.button.export'),
+                            mutualizedDownloadButton: this.$tc('frWidgetLocale.button.export')
+                        }
+                    },
+                })
+                .use(XHRUpload)
+                .use(ImageEditor)
+                .on('export', async (files, popupExportSuccessMsgFn, downloadFilesPackagedFn, downloadFileFn) => {
+                    // console.dir(files);
+                    let currentUrl = window.location.href;
+                    let domainUrl = currentUrl.split("admin#")[0];
+                    let oauthURL = domainUrl + 'api/oauth/token';
+                    fetch(oauthURL, {
+                        method: 'POST',
+                        timeout: 30,
+                        headers: {
+                            'Content-Type': 'application/json; charset=utf-8',
+                        },
+                        body: JSON.stringify({
+                            "client_id": this.frAdminAccessKeyID,
+                            "client_secret": this.frAdminSecretAccessKey,
+                            "grant_type": "client_credentials"
+                        })
+                    }).then((response) => response.json())
+                        .then(async (data) => {
+                            if (data.access_token !== undefined && data.access_token !== '') {
+                                this.adminAuthToken = data.access_token;
+                            }
+
+                            let frFooterButton = document.getElementsByClassName("SfxButton-root");
+                            for (let i = 0; i < frFooterButton.length; i++) {
+                                frFooterButton[i].setAttribute('disabled', 'true');
+                            }
+
+                            let textProcessing = this.$tc('frWidgetLocale.button.processing');
+                            let frExportButton = document.getElementsByClassName('filerobot-Explorer-TopBar-DownloadWithExportButton-downloadButton');
+                            let textExport;
+                            for (let i = 0; i < frExportButton.length; i++) {
+                                textExport = frExportButton[i].innerHTML;
+                                frExportButton[i].setAttribute('disabled', 'true');
+                                frExportButton[i].innerHTML = textProcessing;
+                            }
+
+                            if (this.adminAuthToken !== null) {
+                                for (const selected of files) {
+                                    /**
+                                     * Check media by uuid
+                                     * @type {string}
+                                     */
+                                    let checkURL = domainUrl + 'api/scaleflex/filerobot/check-filerobot-uuid-exist';
+                                    await fetch(checkURL, {
+                                        method: 'POST',
+                                        timeout: 30,
+                                        headers: {
+                                            'Content-Type': 'application/json; charset=utf-8',
+                                            'Authorization': 'Bearer ' + this.adminAuthToken
+                                        },
+                                        body: JSON.stringify({
+                                            "filerobot_uuid": selected.file.uuid
+                                        })
+                                    }).then((response) => response.json())
+                                        .then(async (data) => {
+                                            let media = null;
+                                            if (data !== false) {
+                                                let media_id = data[0].toLowerCase();
+                                                let media = await this.mediaRepository.get(media_id, Context.api);
+                                                this.selection.push(media);
+                                            } else {
+                                                /**
+                                                 * Upload to shopware with FR url
+                                                 */
+                                                let url = new URL(selected.link);
+                                                let fileExtension = selected.file.extension;
+                                                let media_id = await this.onUrlUpload({url, fileExtension});
+
+                                                /**
+                                                 * Waiting while shopware doing upload
+                                                 */
+                                                let checkUpload = false;
+                                                let cleanApiRunning = false;
+                                                while (!checkUpload) {
+                                                    await this.sleep(1000);
+                                                    media = await this.mediaRepository.get(media_id, Context.api);
+                                                    if (media.uploadedAt !== null && !cleanApiRunning) {
+                                                        cleanApiRunning = true;
+                                                        let mediaURL = media.url;
+                                                        let mediaPath = mediaURL.replace(domainUrl, '');
+                                                        let deleteURL = domainUrl + 'api/scaleflex/filerobot/clean-up-media';
+                                                        let filerobotURL = selected.file.url.cdn;
+                                                        filerobotURL = filerobotURL.split('?')[0];
+                                                        fetch(deleteURL, {
+                                                            method: 'POST',
+                                                            timeout: 30,
+                                                            headers: {
+                                                                'Content-Type': 'application/json; charset=utf-8',
+                                                                'Authorization': 'Bearer ' + this.adminAuthToken
+                                                            },
+                                                            body: JSON.stringify({
+                                                                "media_id": media_id,
+                                                                "filerobot_url": filerobotURL,
+                                                                "filerobot_uuid": selected.file.uuid,
+                                                                "media_path": '/' + mediaPath
+                                                            })
+                                                        }).then((response) => response.json())
+                                                            .then(async (data) => {
+                                                                if (!data) {
+                                                                    this.createNotificationError({
+                                                                        title: this.$tc('global.default.error'),
+                                                                        message: this.$tc('frErrors.cleanMediaFail')
+                                                                    });
+                                                                    console.log(this.$tc('frErrors.cleanMediaFail'));
+
+                                                                    for (let i = 0; i < frFooterButton.length; i++) {
+                                                                        frFooterButton[i].removeAttribute('disabled');
+                                                                    }
+                                                                    for (let i = 0; i < frExportButton.length; i++) {
+                                                                        frExportButton[i].removeAttribute('disabled');
+                                                                        frExportButton[i].innerHTML = textExport;
+                                                                    }
+                                                                } else {
+                                                                    this.selection[this.selection.length - 1].url = selected.file.url.cdn;
+                                                                    this.selectedItems = this.selection;
+                                                                    checkUpload = true;
+                                                                }
+                                                            })
+                                                            .catch((error) => {
+                                                                cleanApiRunning = false;
+                                                                console.error('Error:', error);
+                                                                for (let i = 0; i < frFooterButton.length; i++) {
+                                                                    frFooterButton[i].removeAttribute('disabled');
+                                                                }
+                                                                for (let i = 0; i < frExportButton.length; i++) {
+                                                                    frExportButton[i].removeAttribute('disabled');
+                                                                    frExportButton[i].innerHTML = textExport;
+                                                                }
+                                                            });
+                                                    }
+                                                }
+                                            }
+                                        })
+                                        .catch((error) => {
+                                            console.error('Error:', error);
+                                            for (let i = 0; i < frFooterButton.length; i++) {
+                                                frFooterButton[i].removeAttribute('disabled');
+                                            }
+
+                                            for (let i = 0; i < frExportButton.length; i++) {
+                                                frExportButton[i].removeAttribute('disabled');
+                                                frExportButton[i].innerHTML = textExport;
+                                            }
+                                        });
+                                }
+                                // wait selection override url and close modal
+                                await this.sleep(1000);
+                                let modalElement = document.querySelector('.sw-modal.sw-media-modal-v2.sw-modal--full');
+                                modalElement.querySelector('.sw-button.sw-button--primary').click();
+                                this.$emit('media-selection-change', this.selectedItems);
+                            } else {
+                                this.createNotificationError({
+                                    title: this.$tc('global.default.error'),
+                                    message: this.$tc('frErrors.adminAuthToken')
+                                });
+                                console.log(this.$tc('frErrors.adminAuthToken'));
+
+                                for (let i = 0; i < frFooterButton.length; i++) {
+                                    frFooterButton[i].removeAttribute('disabled');
+                                }
+                                for (let i = 0; i < frExportButton.length; i++) {
+                                    frExportButton[i].setAttribute('disabled', 'true');
+                                }
+                            }
+                        })
+                        .catch((error) => {
+                            console.error('Error:', error);
+                        });
+                })
+                .on('complete', ({failed, uploadID, successful}) => {
+                    if (failed) {
+                        console.dir(failed);
+                    }
+
+                    if (successful) {
+                        // console.dir(successful);
+                        successful.forEach((item, key) => {
+                            // do something
+                        });
+                    }
+                });
+
+            setTimeout(function () {
+                window.history.pushState(null, document.title, current_url);
+            }, 1000);
+        }
     },
 });

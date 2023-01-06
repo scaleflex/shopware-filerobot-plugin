@@ -73,7 +73,7 @@ class ScaleflexFilerobot extends Plugin
         $query = $connection->executeQuery("SELECT HEX(id) FROM `media_folder` WHERE `name` = 'Filerobot DAM'");
         $result = $query->fetchOne();
         if ($result) {
-            $folderId = $result;
+            $folderId = strtolower($result);
         } else {
             $folderId = $this->createMediaFolderWithConfiguration();
         }

@@ -72,7 +72,12 @@ Component.register('sw-filerobot-index', {
     mounted() {
         let filerobotScript = document.createElement('script');
         filerobotScript.setAttribute('src', 'https://cdn.scaleflex.it/plugins/filerobot-widget/latest/filerobot-widget.min.js');
+        filerobotScript.setAttribute('async', 'true');
         document.head.appendChild(filerobotScript);
+
+        let frScriptDelete = document.createElement('script');
+        frScriptDelete.innerHTML = 'delete Filerobot';
+        document.head.appendChild(frScriptDelete);
     },
 
     metaInfo() {
@@ -116,9 +121,9 @@ Component.register('sw-filerobot-index', {
                             if (sass === '') {
                                 this.createNotificationError({
                                     title: this.$tc('global.default.error'),
-                                    message: "Filerobot has faild to get key."
+                                    message: this.$tc('frErrors.failedToGetKey')
                                 });
-                                console.log('Filerobot has faild to get key.');
+                                console.log(this.$tc('frErrors.failedToGetKey'));
                             } else {
                                 this.frToken = frToken;
                                 this.frSass = sass;
@@ -142,17 +147,17 @@ Component.register('sw-filerobot-index', {
                 } else {
                     this.createNotificationError({
                         title: this.$tc('global.default.error'),
-                        message: "Filerobot token or Security template identifier is empty. Please check again your plugin configuration."
+                        message: this.$tc('frErrors.tokenOrSEC')
                     });
-                    console.log('Filerobot token or Security template identifier is empty. Please check again your plugin configuration.');
+                    console.log(this.$tc('frErrors.tokenOrSEC'));
                     return false;
                 }
             } else {
                 this.createNotificationError({
                     title: this.$tc('global.default.error'),
-                    message: "Filerobot is not active. Please check again your plugin configuration."
+                    message: this.$tc('frErrors.notActive')
                 });
-                console.log('Filerobot is not active');
+                console.log(this.$tc('frErrors.notActive'));
                 return false;
             }
         },
@@ -162,19 +167,19 @@ Component.register('sw-filerobot-index', {
                 this.mediaService.addListener(this.uploadTag, this.handleMediaServiceUploadEvent);
                 let current_url = window.location.href;
 
-                if (!Filerobot) {
-                    var Filerobot = window.Filerobot;
-                }
+                //wait library loaded
+                await this.waitFilerobotLibrary();
+                let Filerobot = window.Filerobot;
 
                 let filerobot = null;
 
                 // Locale
                 const locales = Filerobot.locales;
                 let defaultLocale = 'EN';
-                if (this.$tc('widget-locale.locale') !== '') {
-                    defaultLocale = this.$tc('widget-locale.locale');
+                if (this.$tc('frWidgetLocale.locale') !== '') {
+                    defaultLocale = this.$tc('frWidgetLocale.locale');
                 }
-                locales[defaultLocale].strings.download = this.$tc('widget-locale.button.export');
+                locales[defaultLocale].strings.download = this.$tc('frWidgetLocale.button.export');
 
                 filerobot = Filerobot.Core({
                     securityTemplateID: this.frSEC,
@@ -189,7 +194,7 @@ Component.register('sw-filerobot-index', {
 
                 // Optional plugins:
                 var ImageEditor = Filerobot.ImageEditor;
-                var Webcam = Filerobot.Webcam;
+                // var Webcam = Filerobot.Webcam;
 
                 filerobot
                     .use(Explorer, {
@@ -220,10 +225,26 @@ Component.register('sw-filerobot-index', {
             } else {
                 this.createNotificationError({
                     title: this.$tc('global.default.error'),
-                    message: "Filerobot is unauthorized."
+                    message: this.$tc('frErrors.unauthorized')
                 });
-                console.log('Filerobot is unauthorized.');
+                console.log(this.$tc('frErrors.unauthorized'));
             }
+        },
+
+        sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        },
+
+        waitFilerobotLibrary() {
+            return new Promise(function (resolve, reject) {
+                let check = false;
+                while (!check) {
+                    if (window.Filerobot !== undefined) {
+                        check = true;
+                        resolve(true);
+                    }
+                }
+            });
         }
     },
 });
