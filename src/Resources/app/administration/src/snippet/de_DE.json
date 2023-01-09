@@ -16,11 +16,11 @@
         }
     },
     "frErrors": {
-        "unauthorized": "Filerobot is unauthorized.",
-        "failedToGetKey": "Filerobot has failed to get key.",
-        "tokenOrSEC": "Filerobot token or Security template identifier is empty. Please check again your plugin configuration.",
-        "notActive": "Filerobot is not active. Please check again your plugin configuration.",
-        "cleanMediaFail": "Clean up media had failed.",
-        "adminAuthToken": "Can't get admin auth token. Please check again your plugin configuration."
+        "unauthorized": "Filerobot ist nicht autorisiert.",
+        "failedToGetKey": "Filerobot konnte keinen Schlüssel abrufen.",
+        "tokenOrSEC": "Filerobot-Token oder Security Tamplate ist leer. Bitte überprüfen Sie erneut die Einstellung des Plugins.",
+        "notActive": "Filerobot ist nicht aktiv. Bitte überprüfen Sie erneut die Einstellung des Plugins.",
+        "cleanMediaFail": "Die Bereinigung der Medien is fehlgeschlagen.",
+        "adminAuthToken": "Admin-Authentifizierungstoken kann nicht abgerufen werden. Bitte überprüfen Sie erneut die Einstellung des Plugina."
     }
 }
