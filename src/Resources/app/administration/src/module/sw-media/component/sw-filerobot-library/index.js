@@ -327,12 +327,12 @@ Component.register('sw-filerobot-library', {
         renderWidget(filerobot) {
             let current_url = window.location.href;
             // Plugins
-            var Explorer = Filerobot.Explorer;
-            var XHRUpload = Filerobot.XHRUpload;
+            let Explorer = Filerobot.Explorer;
+            let XHRUpload = Filerobot.XHRUpload;
 
             // Optional plugins:
-            var ImageEditor = Filerobot.ImageEditor;
-            // var Webcam = Filerobot.Webcam;
+            let ImageEditor = Filerobot.ImageEditor;
+            // let Webcam = Filerobot.Webcam;
 
             filerobot
                 .use(Explorer, {
@@ -361,7 +361,7 @@ Component.register('sw-filerobot-library', {
                     let currentUrl = window.location.href;
                     let domainUrl = currentUrl.split("admin#")[0];
                     let oauthURL = domainUrl + 'api/oauth/token';
-                    fetch(oauthURL, {
+                    await fetch(oauthURL, {
                         method: 'POST',
                         timeout: 30,
                         headers: {
@@ -439,7 +439,7 @@ Component.register('sw-filerobot-library', {
                                                         let deleteURL = domainUrl + 'api/scaleflex/filerobot/clean-up-media';
                                                         let filerobotURL = selected.file.url.cdn;
                                                         filerobotURL = filerobotURL.split('?')[0];
-                                                        fetch(deleteURL, {
+                                                        await fetch(deleteURL, {
                                                             method: 'POST',
                                                             timeout: 30,
                                                             headers: {
@@ -502,7 +502,6 @@ Component.register('sw-filerobot-library', {
                                         });
                                 }
                                 // wait selection override url and close modal
-                                await this.sleep(1000);
                                 let modalElement = document.querySelector('.sw-modal.sw-media-modal-v2.sw-modal--full');
                                 modalElement.querySelector('.sw-button.sw-button--primary').click();
                                 this.$emit('media-selection-change', this.selectedItems);
