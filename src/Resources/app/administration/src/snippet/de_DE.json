@@ -21,6 +21,7 @@
         "tokenOrSEC": "Filerobot-Token oder Security Tamplate ist leer. Bitte überprüfen Sie erneut die Einstellung des Plugins.",
         "notActive": "Filerobot ist nicht aktiv. Bitte überprüfen Sie erneut die Einstellung des Plugins.",
         "cleanMediaFail": "Die Bereinigung der Medien is fehlgeschlagen.",
-        "adminAuthToken": "Admin-Authentifizierungstoken kann nicht abgerufen werden. Bitte überprüfen Sie erneut die Einstellung des Plugina."
+        "adminAuthToken": "Admin-Authentifizierungstoken kann nicht abgerufen werden. Bitte überprüfen Sie erneut die Einstellung des Plugina.",
+        "addMedia": "Das Einlegen des Mediums ist fehlgeschlagen."
     }
 }

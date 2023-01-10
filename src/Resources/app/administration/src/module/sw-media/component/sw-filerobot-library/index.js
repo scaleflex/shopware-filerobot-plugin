@@ -175,7 +175,6 @@ Component.register('sw-filerobot-library', {
                                     title: this.$tc('global.default.error'),
                                     message: this.$tc('frErrors.failedToGetKey')
                                 });
-                                console.log(this.$tc('frErrors.failedToGetKey'));
                             } else {
                                 this.frToken = frToken;
                                 this.frSass = sass;
@@ -201,7 +200,6 @@ Component.register('sw-filerobot-library', {
                         title: this.$tc('global.default.error'),
                         message: this.$tc('frErrors.tokenOrSEC')
                     });
-                    console.log(this.$tc('frErrors.tokenOrSEC'));
                     return false;
                 }
             } else {
@@ -209,7 +207,6 @@ Component.register('sw-filerobot-library', {
                     title: this.$tc('global.default.error'),
                     message: this.$tc('frErrors.notActive')
                 });
-                console.log(this.$tc('frErrors.notActive'));
                 return false;
             }
         },
@@ -249,7 +246,6 @@ Component.register('sw-filerobot-library', {
                     title: this.$tc('global.default.error'),
                     message: this.$tc('frErrors.unauthorized')
                 });
-                console.log(this.$tc('frErrors.unauthorized'));
             }
         },
 
@@ -372,27 +368,28 @@ Component.register('sw-filerobot-library', {
                             "client_secret": this.frAdminSecretAccessKey,
                             "grant_type": "client_credentials"
                         })
-                    }).then((response) => response.json())
+                    })
+                        .then((response) => response.json())
                         .then(async (data) => {
                             if (data.access_token !== undefined && data.access_token !== '') {
                                 this.adminAuthToken = data.access_token;
                             }
 
-                            let frFooterButton = document.getElementsByClassName("SfxButton-root");
-                            for (let i = 0; i < frFooterButton.length; i++) {
-                                frFooterButton[i].setAttribute('disabled', 'true');
-                            }
-
-                            let textProcessing = this.$tc('frWidgetLocale.button.processing');
-                            let frExportButton = document.getElementsByClassName('filerobot-Explorer-TopBar-DownloadWithExportButton-downloadButton');
-                            let textExport;
-                            for (let i = 0; i < frExportButton.length; i++) {
-                                textExport = frExportButton[i].innerHTML;
-                                frExportButton[i].setAttribute('disabled', 'true');
-                                frExportButton[i].innerHTML = textProcessing;
-                            }
-
                             if (this.adminAuthToken !== null) {
+                                let frFooterButton = document.getElementsByClassName("SfxButton-root");
+                                for (let i = 0; i < frFooterButton.length; i++) {
+                                    frFooterButton[i].setAttribute('disabled', 'true');
+                                }
+
+                                let textProcessing = this.$tc('frWidgetLocale.button.processing');
+                                let frExportButton = document.getElementsByClassName('filerobot-Explorer-TopBar-DownloadWithExportButton-downloadButton');
+                                let textExport;
+                                for (let i = 0; i < frExportButton.length; i++) {
+                                    textExport = frExportButton[i].innerHTML;
+                                    frExportButton[i].setAttribute('disabled', 'true');
+                                    frExportButton[i].innerHTML = textProcessing;
+                                }
+
                                 for (const selected of files) {
                                     /**
                                      * Check media by uuid
@@ -409,7 +406,8 @@ Component.register('sw-filerobot-library', {
                                         body: JSON.stringify({
                                             "filerobot_uuid": selected.file.uuid
                                         })
-                                    }).then((response) => response.json())
+                                    })
+                                        .then((response) => response.json())
                                         .then(async (data) => {
                                             let media = null;
                                             if (data !== false) {
@@ -452,14 +450,14 @@ Component.register('sw-filerobot-library', {
                                                                 "filerobot_uuid": selected.file.uuid,
                                                                 "media_path": '/' + mediaPath
                                                             })
-                                                        }).then((response) => response.json())
+                                                        })
+                                                            .then((response) => response.json())
                                                             .then(async (data) => {
                                                                 if (!data) {
                                                                     this.createNotificationError({
                                                                         title: this.$tc('global.default.error'),
                                                                         message: this.$tc('frErrors.cleanMediaFail')
                                                                     });
-                                                                    console.log(this.$tc('frErrors.cleanMediaFail'));
 
                                                                     for (let i = 0; i < frFooterButton.length; i++) {
                                                                         frFooterButton[i].removeAttribute('disabled');
@@ -476,6 +474,10 @@ Component.register('sw-filerobot-library', {
                                                             })
                                                             .catch((error) => {
                                                                 cleanApiRunning = false;
+                                                                this.createNotificationError({
+                                                                    title: this.$tc('global.default.error'),
+                                                                    message: this.$tc('frErrors.cleanMediaFail')
+                                                                });
                                                                 console.error('Error:', error);
                                                                 for (let i = 0; i < frFooterButton.length; i++) {
                                                                     frFooterButton[i].removeAttribute('disabled');
@@ -490,6 +492,10 @@ Component.register('sw-filerobot-library', {
                                             }
                                         })
                                         .catch((error) => {
+                                            this.createNotificationError({
+                                                title: this.$tc('global.default.error'),
+                                                message: this.$tc('frErrors.addMedia')
+                                            });
                                             console.error('Error:', error);
                                             for (let i = 0; i < frFooterButton.length; i++) {
                                                 frFooterButton[i].removeAttribute('disabled');
@@ -502,6 +508,7 @@ Component.register('sw-filerobot-library', {
                                         });
                                 }
                                 // wait selection override url and close modal
+                                await this.sleep(1000);
                                 let modalElement = document.querySelector('.sw-modal.sw-media-modal-v2.sw-modal--full');
                                 modalElement.querySelector('.sw-button.sw-button--primary').click();
                                 this.$emit('media-selection-change', this.selectedItems);
@@ -510,17 +517,13 @@ Component.register('sw-filerobot-library', {
                                     title: this.$tc('global.default.error'),
                                     message: this.$tc('frErrors.adminAuthToken')
                                 });
-                                console.log(this.$tc('frErrors.adminAuthToken'));
-
-                                for (let i = 0; i < frFooterButton.length; i++) {
-                                    frFooterButton[i].removeAttribute('disabled');
-                                }
-                                for (let i = 0; i < frExportButton.length; i++) {
-                                    frExportButton[i].setAttribute('disabled', 'true');
-                                }
                             }
                         })
                         .catch((error) => {
+                            this.createNotificationError({
+                                title: this.$tc('global.default.error'),
+                                message: this.$tc('frErrors.adminAuthToken')
+                            });
                             console.error('Error:', error);
                         });
                 })

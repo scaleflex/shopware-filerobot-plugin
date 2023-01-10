@@ -21,6 +21,7 @@
         "tokenOrSEC": "Filerobot token or Security template identifier is empty. Please check again your plugin configuration.",
         "notActive": "Filerobot is not active. Please check again your plugin configuration.",
         "cleanMediaFail": "Clean up media had failed.",
-        "adminAuthToken": "Can't get admin auth token. Please check again your plugin configuration."
+        "adminAuthToken": "Can't get admin auth token. Please check again your plugin configuration.",
+        "addMedia": "Insert media has been failed."
     }
 }
