@@ -2,6 +2,17 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/platform/trunk/src/Core/System/SystemConfig/Schema/config.xsd">
     <card>
+        <title>Activation</title>
+        <title lang="de-DE">Aktivierung</title>
+        <input-field type="bool">
+            <name>frActivation</name>
+            <label>Enable/Disable the Module</label>
+            <label lang="de-DE">Aktivieren/Deaktivieren des Moduls</label>
+            <defaultValue>true</defaultValue>
+        </input-field>
+    </card>
+
+    <card>
         <title>Admin access key ID</title>
         <title lang="de-DE">Admin-Zugangsschlüssel ID</title>
         <input-field type="text">
@@ -32,17 +43,6 @@
             <label lang="de-DE">Die Medienordner-ID wird automatisch generiert, wenn das Plugin aktiviert wird</label>
             <placeholder>abcdefgh</placeholder>
             <disabled>true</disabled>
-        </input-field>
-    </card>
-
-    <card>
-        <title>Activation</title>
-        <title lang="de-DE">Aktivierung</title>
-        <input-field type="bool">
-            <name>frActivation</name>
-            <label>Enable/Disable the Module</label>
-            <label lang="de-DE">Aktivieren/Deaktivieren des Moduls</label>
-            <defaultValue>true</defaultValue>
         </input-field>
     </card>
 
