@@ -389,7 +389,7 @@ Component.register('sw-filerobot-library', {
                                     frExportButton[i].setAttribute('disabled', 'true');
                                     frExportButton[i].innerHTML = textProcessing;
                                 }
-
+                                let mediaArray = [];
                                 for (const selected of files) {
                                     /**
                                      * Check media by uuid
@@ -426,67 +426,27 @@ Component.register('sw-filerobot-library', {
                                                  * Waiting while shopware doing upload
                                                  */
                                                 let checkUpload = false;
-                                                let cleanApiRunning = false;
                                                 while (!checkUpload) {
                                                     await this.sleep(1000);
                                                     media = await this.mediaRepository.get(media_id, Context.api);
-                                                    if (media.uploadedAt !== null && !cleanApiRunning) {
-                                                        cleanApiRunning = true;
+                                                    if (media.uploadedAt !== null) {
+                                                        //override image url in selection
+                                                        this.selection[this.selection.length - 1].url = selected.file.url.cdn;
+                                                        this.selectedItems = this.selection;
+
+                                                        checkUpload = true;
                                                         let mediaURL = media.url;
                                                         let mediaPath = mediaURL.replace(domainUrl, '');
-                                                        let deleteURL = domainUrl + 'api/scaleflex/filerobot/clean-up-media';
                                                         let filerobotURL = selected.file.url.cdn;
                                                         filerobotURL = filerobotURL.split('?')[0];
-                                                        await fetch(deleteURL, {
-                                                            method: 'POST',
-                                                            timeout: 30,
-                                                            headers: {
-                                                                'Content-Type': 'application/json; charset=utf-8',
-                                                                'Authorization': 'Bearer ' + this.adminAuthToken
-                                                            },
-                                                            body: JSON.stringify({
+                                                        mediaArray.push(
+                                                            {
                                                                 "media_id": media_id,
                                                                 "filerobot_url": filerobotURL,
                                                                 "filerobot_uuid": selected.file.uuid,
                                                                 "media_path": '/' + mediaPath
-                                                            })
-                                                        })
-                                                            .then((response) => response.json())
-                                                            .then(async (data) => {
-                                                                if (!data) {
-                                                                    this.createNotificationError({
-                                                                        title: this.$tc('global.default.error'),
-                                                                        message: this.$tc('frErrors.cleanMediaFail')
-                                                                    });
-
-                                                                    for (let i = 0; i < frFooterButton.length; i++) {
-                                                                        frFooterButton[i].removeAttribute('disabled');
-                                                                    }
-                                                                    for (let i = 0; i < frExportButton.length; i++) {
-                                                                        frExportButton[i].removeAttribute('disabled');
-                                                                        frExportButton[i].innerHTML = textExport;
-                                                                    }
-                                                                } else {
-                                                                    this.selection[this.selection.length - 1].url = selected.file.url.cdn;
-                                                                    this.selectedItems = this.selection;
-                                                                    checkUpload = true;
-                                                                }
-                                                            })
-                                                            .catch((error) => {
-                                                                cleanApiRunning = false;
-                                                                this.createNotificationError({
-                                                                    title: this.$tc('global.default.error'),
-                                                                    message: this.$tc('frErrors.cleanMediaFail')
-                                                                });
-                                                                console.error('Error:', error);
-                                                                for (let i = 0; i < frFooterButton.length; i++) {
-                                                                    frFooterButton[i].removeAttribute('disabled');
-                                                                }
-                                                                for (let i = 0; i < frExportButton.length; i++) {
-                                                                    frExportButton[i].removeAttribute('disabled');
-                                                                    frExportButton[i].innerHTML = textExport;
-                                                                }
-                                                            });
+                                                            }
+                                                        )
                                                     }
                                                 }
                                             }
@@ -508,10 +468,53 @@ Component.register('sw-filerobot-library', {
                                         });
                                 }
                                 // wait selection override url and close modal
-                                await this.sleep(1000);
                                 let modalElement = document.querySelector('.sw-modal.sw-media-modal-v2.sw-modal--full');
                                 modalElement.querySelector('.sw-button.sw-button--primary').click();
                                 this.$emit('media-selection-change', this.selectedItems);
+
+                                for (let i = 0; i < mediaArray.length; i++) {
+                                    let deleteURL = domainUrl + 'api/scaleflex/filerobot/clean-up-media';
+                                    fetch(deleteURL, {
+                                        method: 'POST',
+                                        timeout: 30,
+                                        headers: {
+                                            'Content-Type': 'application/json; charset=utf-8',
+                                            'Authorization': 'Bearer ' + this.adminAuthToken
+                                        },
+                                        body: JSON.stringify(mediaArray[i])
+                                    })
+                                        .then((response) => response.json())
+                                        .then((data) => {
+                                            if (!data) {
+                                                this.createNotificationError({
+                                                    title: this.$tc('global.default.error'),
+                                                    message: this.$tc('frErrors.cleanMediaFail')
+                                                });
+
+                                                for (let i = 0; i < frFooterButton.length; i++) {
+                                                    frFooterButton[i].removeAttribute('disabled');
+                                                }
+                                                for (let i = 0; i < frExportButton.length; i++) {
+                                                    frExportButton[i].removeAttribute('disabled');
+                                                    frExportButton[i].innerHTML = textExport;
+                                                }
+                                            }
+                                        })
+                                        .catch((error) => {
+                                            this.createNotificationError({
+                                                title: this.$tc('global.default.error'),
+                                                message: this.$tc('frErrors.cleanMediaFail')
+                                            });
+                                            console.error('Error:', error);
+                                            for (let i = 0; i < frFooterButton.length; i++) {
+                                                frFooterButton[i].removeAttribute('disabled');
+                                            }
+                                            for (let i = 0; i < frExportButton.length; i++) {
+                                                frExportButton[i].removeAttribute('disabled');
+                                                frExportButton[i].innerHTML = textExport;
+                                            }
+                                        });
+                                }
                             } else {
                                 this.createNotificationError({
                                     title: this.$tc('global.default.error'),
