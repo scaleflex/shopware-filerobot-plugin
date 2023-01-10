@@ -439,7 +439,11 @@ Component.register('sw-filerobot-library', {
                                                         let mediaURL = media.url;
                                                         let mediaPath = mediaURL.replace(domainUrl, '');
                                                         let filerobotURL = selected.file.url.cdn;
-                                                        filerobotURL = filerobotURL.split('?')[0];
+                                                        let newFilerobotUrl = new URL(filerobotURL);
+                                                        if (newFilerobotUrl.searchParams.has('vh')) {
+                                                            newFilerobotUrl.searchParams.delete('vh');
+                                                        }
+                                                        filerobotURL = newFilerobotUrl.href;
                                                         mediaArray.push(
                                                             {
                                                                 "media_id": media_id,
