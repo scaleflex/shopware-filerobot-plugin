@@ -208,7 +208,8 @@ Component.register('sw-filerobot-index', {
                         disableExportButton: true,
                         disableTopBarMainButton: true,
                         hideExportButtonIcon: true,
-                        preventExportDefaultBehavior: true
+                        preventExportDefaultBehavior: true,
+                        dismissUrlPathQueryUpdate: true
                     })
                     .use(ImageEditor)
                     .use(XHRUpload)
@@ -218,10 +219,6 @@ Component.register('sw-filerobot-index', {
                     .on('complete', ({failed, uploadID, successful}) => {
 
                     });
-
-                setTimeout(function () {
-                    window.history.pushState(null, document.title, current_url);
-                }, 1000);
             } else {
                 this.createNotificationError({
                     title: this.$tc('global.default.error'),

@@ -343,6 +343,7 @@ Component.register('sw-filerobot-library', {
                     hideExportButtonIcon: true,
                     preventExportDefaultBehavior: true,
                     resetAfterClose: true,
+                    dismissUrlPathQueryUpdate: true,
                     locale: {
                         strings: {
                             mutualizedExportButtonLabel: this.$tc('frWidgetLocale.button.export'),
@@ -542,10 +543,6 @@ Component.register('sw-filerobot-library', {
                         });
                     }
                 });
-
-            setTimeout(function () {
-                window.history.pushState(null, document.title, current_url);
-            }, 1000);
         }
     },
 });
