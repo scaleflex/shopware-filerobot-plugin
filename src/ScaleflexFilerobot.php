@@ -2,9 +2,7 @@
 
 namespace Scaleflex\Filerobot;
 
-use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\Doctrine\MultiInsertQueryQueue;
 use Shopware\Core\Framework\Plugin;
 use Shopware\Core\Framework\Plugin\Context\InstallContext;
 use Shopware\Core\Framework\Plugin\Context\ActivateContext;
@@ -120,27 +118,6 @@ class ScaleflexFilerobot extends Plugin
     private function createMediaFolderWithConfiguration(): string
     {
         $context = Context::createDefaultContext();
-        $connection = \Shopware\Core\Kernel::getConnection();
-        $query = $connection->executeQuery("SELECT HEX(id) FROM `media_default_folder` WHERE `association_fields` LIKE '%filerobotMedia%'");
-        $result = $query->fetchOne();
-        if ($result) {
-            $defaultFolderId = strtolower($result);
-        } else {
-            $defaultFolderId = Uuid::randomBytes();
-            $queue = new MultiInsertQueryQueue($connection);
-            $queue->addInsert(
-                'media_default_folder',
-                [
-                    'id' => $defaultFolderId,
-                    'association_fields' => '["filerobotMedia"]',
-                    'entity' => 'filerobot',
-                    'created_at' => (new \DateTime())->format(Defaults::STORAGE_DATE_TIME_FORMAT)]
-            );
-            $queue->execute();
-
-            $defaultFolderId = strtolower(Uuid::fromBytesToHex($defaultFolderId));
-        }
-
         $mediaFolderRepository = $this->container->get('media_folder.repository');
         $folderId = Uuid::randomHex();
         $mediaFolderRepository->upsert([
@@ -148,8 +125,7 @@ class ScaleflexFilerobot extends Plugin
                 'id' => $folderId,
                 'name' => 'Filerobot DAM',
                 'useParentConfiguration' => false,
-                'configuration' => [],
-                'defaultFolderId' => $defaultFolderId
+                'configuration' => []
             ],
         ], $context);
 
