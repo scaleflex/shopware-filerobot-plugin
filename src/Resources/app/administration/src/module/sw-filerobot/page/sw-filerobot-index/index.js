@@ -209,7 +209,8 @@ Component.register('sw-filerobot-index', {
                         disableTopBarMainButton: true,
                         hideExportButtonIcon: true,
                         preventExportDefaultBehavior: true,
-                        dismissUrlPathQueryUpdate: true
+                        dismissUrlPathQueryUpdate: true,
+                        hideSearch: true,
                     })
                     .use(ImageEditor)
                     .use(XHRUpload)

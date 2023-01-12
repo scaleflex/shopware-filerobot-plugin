@@ -344,6 +344,7 @@ Component.register('sw-filerobot-library', {
                     preventExportDefaultBehavior: true,
                     resetAfterClose: true,
                     dismissUrlPathQueryUpdate: true,
+                    hideSearch: true,
                     locale: {
                         strings: {
                             mutualizedExportButtonLabel: this.$tc('frWidgetLocale.button.export'),
