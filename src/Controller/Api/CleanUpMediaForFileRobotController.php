@@ -6,6 +6,10 @@ use Shopware\Core\Content\Media\MediaEntity;
 use Shopware\Core\Content\Media\Pathname\PathnameStrategy\FilenamePathnameStrategy;
 use Scaleflex\Filerobot\Extension\Content\Media\Pathname\UrlGeneratorExtension;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\Kernel;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,27 +25,33 @@ use Shopware\Core\Framework\Routing\Annotation\RouteScope;
  */
 class CleanUpMediaForFileRobotController extends AbstractController
 {
+
+    /*
+     * Media repository
+     * */
+    private EntityRepository $mediaRepository;
+
     /*
      * Required parameters for this api to work
      * */
-    private $requiredParameters = [
+    private array $requiredParameters = [
         'media_id',
         'filerobot_url',
         'filerobot_uuid',
         'media_path'
     ];
 
-    private $processedMedia = [];
+    private array $processedMedia = [];
 
     /*
-     * Media data which will be read/written over throughout the clean up steps
+     * Media data which will be read/written over throughout the clean-up steps
      * */
-    private $mediaFileData;
+    private mixed $mediaFileData;
 
-    /*
-     * Connection to db
-     * */
-    private $connection;
+    public function __construct(EntityRepository $mediaRepository)
+    {
+        $this->mediaRepository = $mediaRepository;
+    }
 
     /**
      * @Route("/api/scaleflex/filerobot/clean-up-media", name="api.action.scaleflex.filerobot.clean-up-media", methods={"POST"})
@@ -50,7 +60,7 @@ class CleanUpMediaForFileRobotController extends AbstractController
     {
         $this->getRequiredParameters($request);
 
-        return $this->processCleanUpSteps();
+        return $this->processCleanUpSteps($context);
     }
 
 
@@ -71,14 +81,12 @@ class CleanUpMediaForFileRobotController extends AbstractController
         }
     }
 
-    private function processCleanUpSteps(): JsonResponse
+    private function processCleanUpSteps(Context $context): JsonResponse
     {
-        $this->connection = \Shopware\Core\Kernel::getConnection();
-
-        $this->getMediaFileDataFromDatabaseStep();
+        $this->getMediaFileDataFromDatabaseStep($context);
         $this->generateMediaFilePathStep();
         $this->removeMediaFileFromLocalStep();
-        $this->updateProcessedMediaStep();
+        $this->updateProcessedMediaStep($context);
 
         return new JsonResponse(true);
     }
@@ -88,18 +96,19 @@ class CleanUpMediaForFileRobotController extends AbstractController
      * @return void
      * @throws \Exception
      */
-    private function getMediaFileDataFromDatabaseStep(): void
+    private function getMediaFileDataFromDatabaseStep(Context $context): void
     {
         try {
-            $query = "SELECT HEX(id) as id, file_name as fileName, file_extension as fileExtension
-                    FROM `media` WHERE id = UNHEX('".$this->processedMedia['media_id']."')";
-            $result = $this->connection->executeQuery($query)->fetchAssociative();
+            $criteria = new Criteria();
+            $criteria->setIncludes(['id','file_name', 'file_extension']);
+            $criteria->addFilter(new EqualsFilter('id', $this->processedMedia['media_id']));
+            $mediaInfo = $this->mediaRepository->search($criteria, $context)->first();
 
-            if (empty($result)) {
+            if (empty($mediaInfo)) {
                 throw new \Exception("Media id does not exist");
             }
 
-            $this->mediaFileData = $result;
+            $this->mediaFileData = $mediaInfo;
         } catch (\Exception $exception) {
             throw new \Exception($exception->getMessage());
         }
@@ -114,7 +123,7 @@ class CleanUpMediaForFileRobotController extends AbstractController
     {
         $mediaPath = $this->processedMedia['media_path'];
         $mediaFileFromRequest = $this->getMediaFileFromRequest($mediaPath);
-        $mediaFileFromDatabase = $this->mediaFileData['fileName'] . "." . $this->mediaFileData['fileExtension'];
+        $mediaFileFromDatabase = $this->mediaFileData['file_name'] . "." . $this->mediaFileData['file_extension'];
 
         if ($mediaFileFromDatabase !== $mediaFileFromRequest) {
             throw new \Exception("Media file in media_path does not match with data stored");
@@ -142,16 +151,17 @@ class CleanUpMediaForFileRobotController extends AbstractController
      * Update media table with additional data
      * @throws \Exception
      */
-    private function updateProcessedMediaStep(): void
+    private function updateProcessedMediaStep(Context $context): void
     {
         try {
-            $query = "UPDATE media
-            SET 
-                filerobot_url = '" . $this->processedMedia['filerobot_url'] . "',
-                is_filerobot = 1,
-                filerobot_uuid = '" . $this->processedMedia['filerobot_uuid'] . "'
-            WHERE id = UNHEX('" . $this->processedMedia['media_id'] . "')";
-            $this->connection->executeStatement($query);
+            $this->mediaRepository->update([
+                [
+                    'id' => $this->processedMedia['media_id'],
+                    'filerobot_url' => $this->processedMedia['filerobot_url'],
+                    'is_filerobot' => 1,
+                    'filerobot_uuid' => $this->processedMedia['filerobot_uuid']
+                ]
+            ], $context);
         } catch (\Exception $exception) {
             throw new \Exception($exception->getMessage());
         }

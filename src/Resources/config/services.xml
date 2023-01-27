@@ -8,6 +8,7 @@
             <tag name="kernel.event_subscriber"/>
         </service>
         <service id="Scaleflex\Filerobot\Controller\Api\CheckFilerobotUuidExistApiController" public="true">
+            <argument type="service" id="media.repository"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
@@ -18,6 +19,7 @@
             </call>
         </service>
         <service id="Scaleflex\Filerobot\Controller\Api\CleanUpMediaForFileRobotController" public="true">
+            <argument type="service" id="media.repository"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
