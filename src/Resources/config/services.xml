@@ -24,5 +24,8 @@
                 <argument type="service" id="service_container"/>
             </call>
         </service>
+        <service id="Scaleflex\Filerobot\Extension\Content\Media\MediaExtension">
+            <tag name="shopware.entity.extension"/>
+        </service>
     </services>
 </container>

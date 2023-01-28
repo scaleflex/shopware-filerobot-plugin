@@ -4,6 +4,7 @@ namespace Scaleflex\Filerobot\Controller\Api;
 
 use PHPUnit\Util\Json;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -13,22 +14,13 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Scaleflex\Filerobot\Service\DalMediaService;
 
 /**
  * @RouteScope(scopes={"api"})
  */
 class CheckFilerobotUuidExistApiController extends AbstractController
 {
-    /*
-     * Media repository
-     * */
-    private EntityRepository $mediaRepository;
-
-    public function __construct(EntityRepository $mediaRepository)
-    {
-        $this->mediaRepository = $mediaRepository;
-    }
-
     /**
      * @Route("/api/scaleflex/filerobot/check-filerobot-uuid-exist", name="api.action.scaleflex.filerobot.check-filerobot-uuid-exist", methods={"POST"})
      */
@@ -64,10 +56,12 @@ class CheckFilerobotUuidExistApiController extends AbstractController
      */
     private function checkResult($filerobotUuid, $context): JsonResponse
     {
+
         $criteria = new Criteria();
         $criteria->setIncludes(['id']);
-        $criteria->addFilter(new EqualsFilter('filerobot_uuid', $filerobotUuid));
-        $mediaInfo = $this->mediaRepository->search($criteria, $context)->first();
+        $criteria->addFilter(new EqualsFilter('media.filerobot_uuid', $filerobotUuid));
+        $mediaRepository = $this->container->get('media.repository');
+        $mediaInfo = $mediaRepository->search($criteria, $context)->first();
         $response = ($mediaInfo) ? [
             $mediaInfo
         ] : false;
