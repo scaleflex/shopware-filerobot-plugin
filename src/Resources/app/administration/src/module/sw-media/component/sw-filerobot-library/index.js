@@ -413,7 +413,7 @@ Component.register('sw-filerobot-library', {
                                         .then(async (data) => {
                                             let media = null;
                                             if (data !== false) {
-                                                let media_id = data[0].toLowerCase();
+                                                let media_id = data[0].id;
                                                 let media = await this.mediaRepository.get(media_id, Context.api);
                                                 this.selection.push(media);
                                             } else {

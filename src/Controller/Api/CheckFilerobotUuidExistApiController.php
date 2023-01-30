@@ -53,14 +53,12 @@ class CheckFilerobotUuidExistApiController extends AbstractController
     {
         $filerobotMediaRepository = $this->container->get('filerobot_media.repository');
         $criteriaFR = new Criteria();
-        $criteriaFR->setIncludes(['media_id']);
         $criteriaFR->addFilter(new EqualsFilter('uuid', $filerobotUuid));
         $filerobotMediaInfo = $filerobotMediaRepository->search($criteriaFR, $context)->first();
 
         if ($filerobotMediaInfo) {
             $mediaRepository = $this->container->get('media.repository');
             $criteria = new Criteria();
-            $criteria->setIncludes(['id']);
             $criteria->addFilter(new EqualsFilter('id', $filerobotMediaInfo->mediaId));
 
             $mediaInfo = $mediaRepository->search($criteria, $context)->first();
