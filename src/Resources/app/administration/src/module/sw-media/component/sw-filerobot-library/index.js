@@ -478,25 +478,41 @@ Component.register('sw-filerobot-library', {
                                 modalElement.querySelector('.sw-button.sw-button--primary').click();
                                 this.$emit('media-selection-change', this.selectedItems);
 
-                                for (let i = 0; i < mediaArray.length; i++) {
-                                    let deleteURL = domainUrl + 'api/scaleflex/filerobot/clean-up-media';
-                                    fetch(deleteURL, {
-                                        method: 'POST',
-                                        timeout: 30,
-                                        headers: {
-                                            'Content-Type': 'application/json; charset=utf-8',
-                                            'Authorization': 'Bearer ' + this.adminAuthToken
-                                        },
-                                        body: JSON.stringify(mediaArray[i])
-                                    })
-                                        .then((response) => response.json())
-                                        .then((data) => {
-                                            if (!data) {
+                                if (mediaArray.length) {
+                                    for (let i = 0; i < mediaArray.length; i++) {
+                                        let deleteURL = domainUrl + 'api/scaleflex/filerobot/clean-up-media';
+                                        fetch(deleteURL, {
+                                            method: 'POST',
+                                            timeout: 30,
+                                            headers: {
+                                                'Content-Type': 'application/json; charset=utf-8',
+                                                'Authorization': 'Bearer ' + this.adminAuthToken
+                                            },
+                                            body: JSON.stringify(mediaArray[i])
+                                        })
+                                            .then((response) => response.json())
+                                            .then((data) => {
+                                                if (!data) {
+                                                    this.createNotificationError({
+                                                        title: this.$tc('global.default.error'),
+                                                        message: this.$tc('frErrors.cleanMediaFail')
+                                                    });
+
+                                                    for (let i = 0; i < frFooterButton.length; i++) {
+                                                        frFooterButton[i].removeAttribute('disabled');
+                                                    }
+                                                    for (let i = 0; i < frExportButton.length; i++) {
+                                                        frExportButton[i].removeAttribute('disabled');
+                                                        frExportButton[i].innerHTML = textExport;
+                                                    }
+                                                }
+                                            })
+                                            .catch((error) => {
                                                 this.createNotificationError({
                                                     title: this.$tc('global.default.error'),
                                                     message: this.$tc('frErrors.cleanMediaFail')
                                                 });
-
+                                                console.error('Error:', error);
                                                 for (let i = 0; i < frFooterButton.length; i++) {
                                                     frFooterButton[i].removeAttribute('disabled');
                                                 }
@@ -504,22 +520,8 @@ Component.register('sw-filerobot-library', {
                                                     frExportButton[i].removeAttribute('disabled');
                                                     frExportButton[i].innerHTML = textExport;
                                                 }
-                                            }
-                                        })
-                                        .catch((error) => {
-                                            this.createNotificationError({
-                                                title: this.$tc('global.default.error'),
-                                                message: this.$tc('frErrors.cleanMediaFail')
                                             });
-                                            console.error('Error:', error);
-                                            for (let i = 0; i < frFooterButton.length; i++) {
-                                                frFooterButton[i].removeAttribute('disabled');
-                                            }
-                                            for (let i = 0; i < frExportButton.length; i++) {
-                                                frExportButton[i].removeAttribute('disabled');
-                                                frExportButton[i].innerHTML = textExport;
-                                            }
-                                        });
+                                    }
                                 }
                             } else {
                                 this.createNotificationError({
