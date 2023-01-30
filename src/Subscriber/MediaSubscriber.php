@@ -16,11 +16,11 @@ class MediaSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            MediaEvents::MEDIA_LOADED_EVENT => 'onMediasLoaded'
+            MediaEvents::MEDIA_LOADED_EVENT => 'onMediaLoaded'
         ];
     }
 
-    public function onMediasLoaded(EntityLoadedEvent $event): void
+    public function onMediaLoaded(EntityLoadedEvent $event): void
     {
         $context = (array)$event->getContext()->getSource();
         $isAdmin = false;
@@ -34,11 +34,11 @@ class MediaSubscriber implements EventSubscriberInterface
             $id = $mediaEntity->getId();
             $connection = Kernel::getConnection();
             $media = $connection->fetchAssociative(
-                'SELECT is_filerobot, filerobot_url, filerobot_uuid FROM media WHERE id = :id',
+                'SELECT url, uuid FROM filerobot_media WHERE media_id = :id',
                 ['id' => Uuid::fromHexToBytes($id)]
             );
-            if ($media['is_filerobot']) {
-                $mediaEntity->setUrl($media['filerobot_url']);
+            if ($media) {
+                $mediaEntity->setUrl($media['url']);
 
                 if (!$isAdmin) {
                     $mediaThumbnailSizes = $connection->fetchAllAssociative(
@@ -51,7 +51,7 @@ class MediaSubscriber implements EventSubscriberInterface
                             $thumbnailEntity->setId(Uuid::randomHex());
                             $thumbnailEntity->setHeight((int)$mediaThumbnailSize['height']);
                             $thumbnailEntity->setWidth((int)$mediaThumbnailSize['width']);
-                            $thumbnailEntity->setUrl($media['filerobot_url'] . '?w=' . $mediaThumbnailSize['width']);
+                            $thumbnailEntity->setUrl($media['url'] . '?w=' . $mediaThumbnailSize['width']);
                             $mediaThumbnailCollectionArray[] = $thumbnailEntity;
                         }
                         $mediaThumbnailCollection = new MediaThumbnailCollection($mediaThumbnailCollectionArray);

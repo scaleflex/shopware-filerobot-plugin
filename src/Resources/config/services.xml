@@ -7,25 +7,33 @@
         <service id="Scaleflex\Filerobot\Subscriber\MediaSubscriber">
             <tag name="kernel.event_subscriber"/>
         </service>
+
+        <service id="Scaleflex\Filerobot\Core\Content\FilerobotMedia\FilerobotMediaDefinition">
+            <tag name="shopware.entity.definition" entity="filerobot_media" />
+        </service>
+
+        <service id="Scaleflex\Filerobot\Extension\Content\Media\FilerobotMediaExtension">
+            <tag name="shopware.entity.extension"/>
+        </service>
+
         <service id="Scaleflex\Filerobot\Controller\Api\CheckFilerobotUuidExistApiController" public="true">
             <argument type="service" id="media.repository"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
         </service>
+
         <service id="Scaleflex\Filerobot\Controller\Api\ApiTestController" public="true">
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
         </service>
+
         <service id="Scaleflex\Filerobot\Controller\Api\CleanUpMediaForFileRobotController" public="true">
             <argument type="service" id="media.repository"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
-        </service>
-        <service id="Scaleflex\Filerobot\Extension\Content\Media\MediaExtension">
-            <tag name="shopware.entity.extension"/>
         </service>
     </services>
 </container>

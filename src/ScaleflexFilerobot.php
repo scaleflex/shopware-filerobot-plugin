@@ -3,6 +3,8 @@
 namespace Scaleflex\Filerobot;
 
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Plugin;
 use Shopware\Core\Framework\Plugin\Context\InstallContext;
 use Shopware\Core\Framework\Plugin\Context\ActivateContext;
@@ -32,11 +34,7 @@ class ScaleflexFilerobot extends Plugin
          * Delete all related data
          */
         $connection = \Shopware\Core\Kernel::getConnection();
-        $query = $connection->executeQuery("SHOW COLUMNS FROM `media` LIKE 'filerobot_url'");
-        $result = $query->fetchAllAssociative();
-        if (count($result) !== 0) {
-            $this->dropFilerobotColumns($connection);
-        }
+        $connection->executeStatement("DROP TABLE IF EXISTS `filerobot_media`");
     }
 
     public function activate(ActivateContext $activateContext): void

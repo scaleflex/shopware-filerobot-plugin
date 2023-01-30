@@ -2,19 +2,14 @@
 
 namespace Scaleflex\Filerobot\Controller\Api;
 
-use PHPUnit\Util\Json;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Shopware\Core\Framework\Api\Controller\ApiController;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
-use Scaleflex\Filerobot\Service\DalMediaService;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @RouteScope(scopes={"api"})
@@ -56,16 +51,26 @@ class CheckFilerobotUuidExistApiController extends AbstractController
      */
     private function checkResult($filerobotUuid, $context): JsonResponse
     {
+        $filerobotMediaRepository = $this->container->get('filerobot_media.repository');
+        $criteriaFR = new Criteria();
+        $criteriaFR->setIncludes(['media_id']);
+        $criteriaFR->addFilter(new EqualsFilter('uuid', $filerobotUuid));
+        $filerobotMediaInfo = $filerobotMediaRepository->search($criteriaFR, $context)->first();
 
-        $criteria = new Criteria();
-        $criteria->setIncludes(['id']);
-        $criteria->addFilter(new EqualsFilter('media.filerobot_uuid', $filerobotUuid));
-        $mediaRepository = $this->container->get('media.repository');
-        $mediaInfo = $mediaRepository->search($criteria, $context)->first();
-        $response = ($mediaInfo) ? [
-            $mediaInfo
-        ] : false;
+        if ($filerobotMediaInfo) {
+            $mediaRepository = $this->container->get('media.repository');
+            $criteria = new Criteria();
+            $criteria->setIncludes(['id']);
+            $criteria->addFilter(new EqualsFilter('id', $filerobotMediaInfo->mediaId));
 
-        return new JsonResponse($response);
+            $mediaInfo = $mediaRepository->search($criteria, $context)->first();
+            $response = ($mediaInfo) ? [
+                $mediaInfo
+            ] : false;
+
+            return new JsonResponse($response);
+        } else {
+            return new JsonResponse(false);
+        }
     }
 }
