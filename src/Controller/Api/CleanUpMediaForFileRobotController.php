@@ -129,8 +129,10 @@ class CleanUpMediaForFileRobotController extends AbstractController
     private function removeMediaFileFromLocalStep(): void
     {
         try {
-            if (file_exists($this->processedMedia['file_path'])) {
-                unlink($this->processedMedia['file_path']);
+            $filerobotFilesystem = $this->container->get('scaleflex_filerobot_plugin.filesystem');
+
+            if ($filerobotFilesystem->hasPublicFile($this->processedMedia['file_path'])) {
+                $filerobotFilesystem->removePublicFile($this->processedMedia['file_path']);
             }
         } catch (\Exception $exception) {
             throw new \Exception($exception->getMessage());
@@ -145,27 +147,14 @@ class CleanUpMediaForFileRobotController extends AbstractController
     {
         try {
             $filerobotMediaRepository = $this->container->get('filerobot_media.repository');
-            $criteriaFR = new Criteria();
-            $criteriaFR->addFilter(new EqualsFilter('mediaId', $this->processedMedia['media_id']));
-            $filerobotMediaInfo = $filerobotMediaRepository->search($criteriaFR, $context)->first();
-            if ($filerobotMediaInfo) {
-                $filerobotMediaRepository->update([
-                    [
-                        'id' => $filerobotMediaInfo->id,
-                        'url' => $this->processedMedia['filerobot_url'],
-                        'uuid' => $this->processedMedia['filerobot_uuid']
-                    ]
-                ], $context);
-            } else {
-                $filerobotMediaRepository->create([
-                    [
-                        'id' => Uuid::randomHex(),
-                        'mediaId' => $this->processedMedia['media_id'],
-                        'url' => $this->processedMedia['filerobot_url'],
-                        'uuid' => $this->processedMedia['filerobot_uuid']
-                    ]
-                ], $context);
-            }
+            $filerobotMediaRepository->create([
+                [
+                    'id' => Uuid::randomHex(),
+                    'mediaId' => $this->processedMedia['media_id'],
+                    'url' => $this->processedMedia['filerobot_url'],
+                    'uuid' => $this->processedMedia['filerobot_uuid']
+                ]
+            ], $context);
         } catch (\Exception $exception) {
             throw new \Exception($exception->getMessage());
         }

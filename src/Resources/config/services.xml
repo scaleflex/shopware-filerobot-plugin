@@ -16,21 +16,24 @@
             <tag name="shopware.entity.extension"/>
         </service>
 
-        <service id="Scaleflex\Filerobot\Controller\Api\CheckFilerobotUuidExistApiController" public="true">
-            <argument type="service" id="media.repository"/>
-            <call method="setContainer">
-                <argument type="service" id="service_container"/>
-            </call>
+        <service id="scaleflex_filerobot_plugin.filesystem" class="Scaleflex\Filerobot\Service\FilesystemService">
+            <argument type="service" id="scaleflex_filerobot.filesystem.public"/>
+            <argument type="service" id="scaleflex_filerobot.filesystem.private"/>
         </service>
 
-        <service id="Scaleflex\Filerobot\Controller\Api\ApiTestController" public="true">
+        <service id="Scaleflex\Filerobot\Controller\Api\CheckFilerobotUuidExistApiController" public="true">
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
         </service>
 
         <service id="Scaleflex\Filerobot\Controller\Api\CleanUpMediaForFileRobotController" public="true">
-            <argument type="service" id="media.repository"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
+
+        <service id="Scaleflex\Filerobot\Controller\Api\ApiTestController" public="true">
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
