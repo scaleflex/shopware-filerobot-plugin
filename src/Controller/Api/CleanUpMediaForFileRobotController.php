@@ -41,9 +41,9 @@ class CleanUpMediaForFileRobotController extends AbstractController
     /*
      * Media data which will be read/written over throughout the clean-up steps
      * */
-    private object $mediaFileData;
+    private $mediaFileData;
 
-    private FilesystemService $filesystemService;
+    private $filesystemService;
 
     public function __construct(
         FilesystemService $filesystemService
