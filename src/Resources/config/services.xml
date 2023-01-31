@@ -4,7 +4,14 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
+        <service id="scaleflex_filerobot_plugin.filesystem" class="Scaleflex\Filerobot\Service\FilesystemService">
+            <argument type="service" id="shopware.filesystem.public"/>
+            <argument type="service" id="shopware.filesystem.private"/>
+        </service>
+
         <service id="Scaleflex\Filerobot\Subscriber\MediaSubscriber">
+            <argument type="service" id="filerobot_media.repository"/>
+            <argument type="service" id="media_thumbnail_size.repository"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
@@ -16,11 +23,6 @@
             <tag name="shopware.entity.extension"/>
         </service>
 
-        <service id="scaleflex_filerobot_plugin.filesystem" class="Scaleflex\Filerobot\Service\FilesystemService">
-            <argument type="service" id="scaleflex_filerobot.filesystem.public"/>
-            <argument type="service" id="scaleflex_filerobot.filesystem.private"/>
-        </service>
-
         <service id="Scaleflex\Filerobot\Controller\Api\CheckFilerobotUuidExistApiController" public="true">
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
@@ -28,6 +30,7 @@
         </service>
 
         <service id="Scaleflex\Filerobot\Controller\Api\CleanUpMediaForFileRobotController" public="true">
+            <argument type="service" id="scaleflex_filerobot_plugin.filesystem"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>

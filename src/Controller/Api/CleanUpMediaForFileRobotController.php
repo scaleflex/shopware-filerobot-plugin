@@ -2,6 +2,7 @@
 
 namespace Scaleflex\Filerobot\Controller\Api;
 
+use Scaleflex\Filerobot\Service\FilesystemService;
 use Shopware\Core\Content\Media\MediaEntity;
 use Shopware\Core\Content\Media\Pathname\PathnameStrategy\FilenamePathnameStrategy;
 use Scaleflex\Filerobot\Extension\Content\Media\Pathname\UrlGeneratorExtension;
@@ -41,6 +42,15 @@ class CleanUpMediaForFileRobotController extends AbstractController
      * Media data which will be read/written over throughout the clean-up steps
      * */
     private object $mediaFileData;
+
+    private FilesystemService $filesystemService;
+
+    public function __construct(
+        FilesystemService $filesystemService
+    )
+    {
+        $this->filesystemService = $filesystemService;
+    }
 
     /**
      * @Route("/api/scaleflex/filerobot/clean-up-media", name="api.action.scaleflex.filerobot.clean-up-media", methods={"POST"})
@@ -119,7 +129,7 @@ class CleanUpMediaForFileRobotController extends AbstractController
             throw new \Exception("Media file in media_path does not match with data stored");
         }
 
-        $this->processedMedia['file_path'] = getcwd() . '/' . $mediaPath;
+        $this->processedMedia['file_path'] = $mediaPath;
     }
 
     /**
@@ -129,10 +139,8 @@ class CleanUpMediaForFileRobotController extends AbstractController
     private function removeMediaFileFromLocalStep(): void
     {
         try {
-            $filerobotFilesystem = $this->container->get('scaleflex_filerobot_plugin.filesystem');
-
-            if ($filerobotFilesystem->hasPublicFile($this->processedMedia['file_path'])) {
-                $filerobotFilesystem->removePublicFile($this->processedMedia['file_path']);
+            if ($this->filesystemService->hasPublicFile($this->processedMedia['file_path'])) {
+                $this->filesystemService->removePublicFile($this->processedMedia['file_path']);
             }
         } catch (\Exception $exception) {
             throw new \Exception($exception->getMessage());

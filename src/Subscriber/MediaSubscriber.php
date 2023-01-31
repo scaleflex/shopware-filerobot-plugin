@@ -5,18 +5,35 @@ namespace Scaleflex\Filerobot\Subscriber;
 use Shopware\Core\Content\Media\Aggregate\MediaThumbnail\MediaThumbnailCollection;
 use Shopware\Core\Content\Media\Aggregate\MediaThumbnail\MediaThumbnailEntity;
 use Shopware\Core\Content\Media\MediaEntity;
+use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityDeletedEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityLoadedEvent;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Shopware\Core\Content\Media\MediaEvents;
-use Shopware\Core\Kernel;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 
 class MediaSubscriber implements EventSubscriberInterface
 {
+    private EntityRepositoryInterface $filerobotMediaRepository;
+    private EntityRepositoryInterface $mediaThumbnailSizeRepository;
+
+
+    public function __construct(
+        EntityRepositoryInterface $filerobotMediaRepository,
+        EntityRepositoryInterface $mediaThumbnailSizeRepository
+    )
+    {
+        $this->filerobotMediaRepository = $filerobotMediaRepository;
+        $this->mediaThumbnailSizeRepository = $mediaThumbnailSizeRepository;
+    }
+
     public static function getSubscribedEvents(): array
     {
         return [
-            MediaEvents::MEDIA_LOADED_EVENT => 'onMediaLoaded'
+            MediaEvents::MEDIA_LOADED_EVENT => 'onMediaLoaded',
+            MediaEvents::MEDIA_DELETED_EVENT => 'onMediaDeleted'
         ];
     }
 
@@ -32,26 +49,23 @@ class MediaSubscriber implements EventSubscriberInterface
         /** @var MediaEntity $mediaEntity */
         foreach ($event->getEntities() as $mediaEntity) {
             $id = $mediaEntity->getId();
-            $connection = Kernel::getConnection();
-            $media = $connection->fetchAssociative(
-                'SELECT url, uuid FROM filerobot_media WHERE media_id = :id',
-                ['id' => Uuid::fromHexToBytes($id)]
-            );
-            if ($media) {
-                $mediaEntity->setUrl($media['url']);
+            $criteriaFR = new Criteria();
+            $criteriaFR->addFilter(new EqualsFilter('mediaId', $id));
+            $filerobotMedia = $this->filerobotMediaRepository->search($criteriaFR, $event->getContext())->first();
+            if ($filerobotMedia) {
+                $mediaEntity->setUrl($filerobotMedia->url);
 
                 if (!$isAdmin) {
-                    $mediaThumbnailSizes = $connection->fetchAllAssociative(
-                        'SELECT width, height FROM media_thumbnail_size'
-                    );
+                    $criteriaMediaThumbnailSize = new Criteria();
+                    $mediaThumbnailSizes = $this->mediaThumbnailSizeRepository->search($criteriaMediaThumbnailSize, $event->getContext());
                     if (count($mediaThumbnailSizes)) {
                         $mediaThumbnailCollectionArray = [];
                         foreach ($mediaThumbnailSizes as $mediaThumbnailSize) {
                             $thumbnailEntity = new MediaThumbnailEntity();
                             $thumbnailEntity->setId(Uuid::randomHex());
-                            $thumbnailEntity->setHeight((int)$mediaThumbnailSize['height']);
-                            $thumbnailEntity->setWidth((int)$mediaThumbnailSize['width']);
-                            $thumbnailEntity->setUrl($media['url'] . '?w=' . $mediaThumbnailSize['width']);
+                            $thumbnailEntity->setHeight((int)$mediaThumbnailSize->height);
+                            $thumbnailEntity->setWidth((int)$mediaThumbnailSize->width);
+                            $thumbnailEntity->setUrl($filerobotMedia->url . '?w=' . $mediaThumbnailSize->width);
                             $mediaThumbnailCollectionArray[] = $thumbnailEntity;
                         }
                         $mediaThumbnailCollection = new MediaThumbnailCollection($mediaThumbnailCollectionArray);
@@ -60,5 +74,22 @@ class MediaSubscriber implements EventSubscriberInterface
                 }
             }
         }
+    }
+
+    /**
+     * Delete media on table "filerobot_media"
+     */
+    public function onMediaDeleted(EntityDeletedEvent $event): void
+    {
+        $ids = [];
+        foreach ($event->getIds() as $mediaId) {
+            $criteriaFR = new Criteria();
+            $criteriaFR->addFilter(new EqualsFilter('mediaId', $mediaId));
+            $filerobotMedia = $this->filerobotMediaRepository->search($criteriaFR, $event->getContext())->first();
+            if ($filerobotMedia) {
+                $ids[] = ['id' => $filerobotMedia->id];
+            }
+        }
+        $this->filerobotMediaRepository->delete($ids, $event->getContext());
     }
 }
