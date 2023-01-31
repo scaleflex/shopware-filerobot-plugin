@@ -16,8 +16,8 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 
 class MediaSubscriber implements EventSubscriberInterface
 {
-    private EntityRepositoryInterface $filerobotMediaRepository;
-    private EntityRepositoryInterface $mediaThumbnailSizeRepository;
+    private $filerobotMediaRepository;
+    private $mediaThumbnailSizeRepository;
 
 
     public function __construct(

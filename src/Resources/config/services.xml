@@ -6,7 +6,6 @@
     <services>
         <service id="scaleflex_filerobot_plugin.filesystem" class="Scaleflex\Filerobot\Service\FilesystemService">
             <argument type="service" id="shopware.filesystem.public"/>
-            <argument type="service" id="shopware.filesystem.private"/>
         </service>
 
         <service id="Scaleflex\Filerobot\Subscriber\MediaSubscriber">

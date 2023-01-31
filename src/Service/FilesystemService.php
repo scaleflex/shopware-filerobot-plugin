@@ -6,25 +6,15 @@ use League\Flysystem\FilesystemInterface;
 
 class FilesystemService
 {
-    /**
-     * @var FilesystemInterface
-     */
-    private FilesystemInterface $fileSystemPublic;
-
-    /**
-     * @var FilesystemInterface
-     */
-    private FilesystemInterface $fileSystemPrivate;
+    private $fileSystemPublic;
 
     /**
      * FilesystemService constructor.
      * @param FilesystemInterface $fileSystemPublic
-     * @param FilesystemInterface $fileSystemPrivate
      */
-    public function __construct(FilesystemInterface $fileSystemPublic, FilesystemInterface $fileSystemPrivate)
+    public function __construct(FilesystemInterface $fileSystemPublic)
     {
         $this->fileSystemPublic = $fileSystemPublic;
-        $this->fileSystemPrivate = $fileSystemPrivate;
     }
 
     public function hasPublicFile(string $filename): bool

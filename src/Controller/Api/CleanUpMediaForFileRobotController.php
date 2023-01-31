@@ -29,14 +29,14 @@ class CleanUpMediaForFileRobotController extends AbstractController
     /*
      * Required parameters for this api to work
      * */
-    private array $requiredParameters = [
+    private $requiredParameters = [
         'media_id',
         'filerobot_url',
         'filerobot_uuid',
         'media_path'
     ];
 
-    private array $processedMedia = [];
+    private $processedMedia = [];
 
     /*
      * Media data which will be read/written over throughout the clean-up steps
