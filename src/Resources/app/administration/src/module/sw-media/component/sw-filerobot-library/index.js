@@ -50,6 +50,12 @@ Component.register('sw-filerobot-library', {
             default: null,
         },
 
+        frCNAME: {
+            type: String,
+            required: false,
+            default: null,
+        },
+
         frFolderId: {
             type: String,
             required: false,
@@ -148,6 +154,7 @@ Component.register('sw-filerobot-library', {
             let frActivation = frConfig['ScaleflexFilerobot.config.frActivation'];
             let frSEC = frConfig['ScaleflexFilerobot.config.frSEC'];
             let frToken = frConfig['ScaleflexFilerobot.config.frToken'];
+            let frCNAME = frConfig['ScaleflexFilerobot.config.frCNAME'];
             let frUploadDirectory = frConfig['ScaleflexFilerobot.config.frUploadDirectory'];
             let frAdminAccessKeyID = frConfig['ScaleflexFilerobot.config.frAdminAccessKeyID'];
             let frAdminSecretAccessKey = frConfig['ScaleflexFilerobot.config.frAdminSecretAccessKey'];
@@ -184,6 +191,7 @@ Component.register('sw-filerobot-library', {
                                 this.frAdminAccessKeyID = frAdminAccessKeyID;
                                 this.frAdminSecretAccessKey = frAdminSecretAccessKey;
                                 this.frFolderId = frFolderId;
+                                this.frCNAME = frCNAME;
                             }
                         })
                         .catch((error) => {
@@ -444,6 +452,13 @@ Component.register('sw-filerobot-library', {
                                                         if (newFilerobotUrl.searchParams.has('vh')) {
                                                             newFilerobotUrl.searchParams.delete('vh');
                                                         }
+
+                                                        console.log(this.frCNAME);
+                                                        if (this.frCNAME !== '' && this.frCNAME !== null) {
+                                                            newFilerobotUrl.host = this.frCNAME;
+                                                            newFilerobotUrl.hostname = this.frCNAME;
+                                                        }
+
                                                         filerobotURL = newFilerobotUrl.href;
                                                         mediaArray.push(
                                                             {

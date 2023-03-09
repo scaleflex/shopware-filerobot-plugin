@@ -12,21 +12,25 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Shopware\Core\Content\Media\MediaEvents;
+use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 
 class MediaSubscriber implements EventSubscriberInterface
 {
     private $filerobotMediaRepository;
     private $mediaThumbnailSizeRepository;
+    private $systemConfigService;
 
 
     public function __construct(
         EntityRepositoryInterface $filerobotMediaRepository,
-        EntityRepositoryInterface $mediaThumbnailSizeRepository
+        EntityRepositoryInterface $mediaThumbnailSizeRepository,
+        SystemConfigService $systemConfigService
     )
     {
         $this->filerobotMediaRepository = $filerobotMediaRepository;
         $this->mediaThumbnailSizeRepository = $mediaThumbnailSizeRepository;
+        $this->systemConfigService = $systemConfigService;
     }
 
     public static function getSubscribedEvents(): array
@@ -39,6 +43,11 @@ class MediaSubscriber implements EventSubscriberInterface
 
     public function onMediaLoaded(EntityLoadedEvent $event): void
     {
+        $frActivation = $this->systemConfigService->get('ScaleflexFilerobot.config.frActivation');
+        if (!$frActivation) {
+            return;
+        }
+
         $context = (array)$event->getContext()->getSource();
         $isAdmin = false;
         foreach ($context as $key => $value) {
@@ -81,6 +90,11 @@ class MediaSubscriber implements EventSubscriberInterface
      */
     public function onMediaDeleted(EntityDeletedEvent $event): void
     {
+        $frActivation = $this->systemConfigService->get('ScaleflexFilerobot.config.frActivation');
+        if (!$frActivation) {
+            return;
+        }
+
         $ids = [];
         foreach ($event->getIds() as $mediaId) {
             $criteriaFR = new Criteria();
