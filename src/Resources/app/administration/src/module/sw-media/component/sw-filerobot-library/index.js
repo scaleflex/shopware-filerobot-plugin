@@ -453,13 +453,11 @@ Component.register('sw-filerobot-library', {
                                                             newFilerobotUrl.searchParams.delete('vh');
                                                         }
 
-                                                        console.log(this.frCNAME);
                                                         if (this.frCNAME !== '' && this.frCNAME !== null) {
                                                             newFilerobotUrl.host = this.frCNAME;
                                                             newFilerobotUrl.hostname = this.frCNAME;
                                                         }
 
-                                                        filerobotURL = newFilerobotUrl.href;
                                                         mediaArray.push(
                                                             {
                                                                 "media_id": media_id,
