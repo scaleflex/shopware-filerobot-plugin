@@ -21,8 +21,9 @@ class ApiTestController extends AbstractController
         /**
          * Verify Filerobot Token
          */
-        $frSEC = $request->get('ScaleflexFilerobot.config.frSEC');
-        $frToken = $request->get('ScaleflexFilerobot.config.frToken');
+        $requestContent = json_decode($request->getContent(), true);
+        $frSEC = $requestContent['ScaleflexFilerobot.config.frSEC'];
+        $frToken = $requestContent['ScaleflexFilerobot.config.frToken'];
 
         $endPoint = 'https://api.filerobot.com/' . $frToken . '/key/' . $frSEC;
         $success = false;
@@ -54,8 +55,8 @@ class ApiTestController extends AbstractController
         /**
          * Verify Admin Auth Token
          */
-        $frAdminAccessKeyID = $request->get('ScaleflexFilerobot.config.frAdminAccessKeyID');
-        $frAdminSecretAccessKey = $request->get('ScaleflexFilerobot.config.frAdminSecretAccessKey');
+        $frAdminAccessKeyID = $requestContent['ScaleflexFilerobot.config.frAdminAccessKeyID'];
+        $frAdminSecretAccessKey = $requestContent['ScaleflexFilerobot.config.frAdminSecretAccessKey'];
 
         $urlExplode = $request->getUri();
         $url = explode('api', $urlExplode)[0];

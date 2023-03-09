@@ -71,8 +71,9 @@ class CleanUpMediaForFileRobotController extends AbstractController
      */
     private function getRequiredParameters(Request $request): void
     {
+        $requestContent = json_decode($request->getContent(), true);
         foreach($this->requiredParameters as $requiredParameter) {
-            $val = $request->get($requiredParameter);
+            $val = $requestContent[$requiredParameter];
             if (empty($val)) {
                 throw new \Exception("$requiredParameter is required and must not be empty");
             }
