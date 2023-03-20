@@ -71,7 +71,7 @@ Component.register('sw-filerobot-index', {
 
     mounted() {
         let filerobotScript = document.createElement('script');
-        filerobotScript.setAttribute('src', 'https://cdn.scaleflex.it/plugins/filerobot-widget/latest/filerobot-widget.min.js');
+        filerobotScript.setAttribute('src', 'https://scaleflex.cloudimg.io/v7/plugins/filerobot-widget/1.8.0/filerobot-widget.min.js?vh=62d509&func=proxy');
         filerobotScript.setAttribute('async', 'true');
         document.head.appendChild(filerobotScript);
 
