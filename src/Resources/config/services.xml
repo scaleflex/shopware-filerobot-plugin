@@ -4,6 +4,9 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
+        <service id="Scaleflex\Filerobot\Component\DependencyInjection\CustomProfilerExtensions" />
+        <service id="Scaleflex\Filerobot\Component\Profiler\TwigDecorator" />
+
         <service id="scaleflex_filerobot_plugin.filesystem" class="Scaleflex\Filerobot\Service\FilesystemService">
             <argument type="service" id="shopware.filesystem.public"/>
         </service>

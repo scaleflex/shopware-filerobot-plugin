@@ -2,6 +2,7 @@
 
 namespace Scaleflex\Filerobot;
 
+use Scaleflex\Filerobot\Component\DependencyInjection\CustomProfilerExtensions;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
@@ -10,9 +11,16 @@ use Shopware\Core\Framework\Plugin\Context\InstallContext;
 use Shopware\Core\Framework\Plugin\Context\ActivateContext;
 use Shopware\Core\Framework\Plugin\Context\UninstallContext;
 use Shopware\Core\Framework\Uuid\Uuid;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class ScaleflexFilerobot extends Plugin
 {
+    public function build(ContainerBuilder $container): void
+    {
+        $container->addCompilerPass(new CustomProfilerExtensions());
+        parent::build($container);
+    }
+
     public function install(InstallContext $installContext): void
     {
         parent::install($installContext);
