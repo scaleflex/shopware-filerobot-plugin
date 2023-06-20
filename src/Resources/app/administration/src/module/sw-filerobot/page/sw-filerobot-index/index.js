@@ -71,7 +71,7 @@ Component.register('sw-filerobot-index', {
 
     mounted() {
         let filerobotScript = document.createElement('script');
-        filerobotScript.setAttribute('src', 'https://scaleflex.cloudimg.io/v7/plugins/filerobot-widget/1.8.0/filerobot-widget.min.js?vh=62d509&func=proxy');
+        filerobotScript.setAttribute('src', 'https://scaleflex.cloudimg.io/v7/plugins/filerobot-widget/latest/filerobot-widget.min.js?vh=a7ea41&func=proxy');
         filerobotScript.setAttribute('async', 'true');
         document.head.appendChild(filerobotScript);
 
@@ -205,12 +205,12 @@ Component.register('sw-filerobot-index', {
                         inline: true,
                         width: 10000,
                         height: 1000,
-                        disableExportButton: true,
+                        disableExportButton: false,
                         disableTopBarMainButton: true,
                         hideExportButtonIcon: true,
                         preventExportDefaultBehavior: true,
                         dismissUrlPathQueryUpdate: true,
-                        hideSearch: true,
+                        resetAfterClose: true,
                     })
                     .use(ImageEditor)
                     .use(XHRUpload)

@@ -104,7 +104,7 @@ Component.register('sw-filerobot-library', {
 
     mounted() {
         let filerobotScript = document.createElement('script');
-        filerobotScript.setAttribute('src', 'https://scaleflex.cloudimg.io/v7/plugins/filerobot-widget/1.8.0/filerobot-widget.min.js?vh=62d509&func=proxy');
+        filerobotScript.setAttribute('src', 'https://scaleflex.cloudimg.io/v7/plugins/filerobot-widget/latest/filerobot-widget.min.js?vh=a7ea41&func=proxy');
         filerobotScript.setAttribute('async', 'true');
         document.head.appendChild(filerobotScript);
 
@@ -347,12 +347,11 @@ Component.register('sw-filerobot-library', {
                     inline: true,
                     width: 10000,
                     height: 1000,
-                    disableExportButton: true,
+                    disableExportButton: false,
                     hideExportButtonIcon: true,
                     preventExportDefaultBehavior: true,
                     resetAfterClose: true,
                     dismissUrlPathQueryUpdate: true,
-                    hideSearch: true,
                     locale: {
                         strings: {
                             mutualizedExportButtonLabel: this.$tc('frWidgetLocale.button.export'),
