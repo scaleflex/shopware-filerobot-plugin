@@ -104,7 +104,7 @@ Component.register('sw-filerobot-library', {
 
     mounted() {
         let filerobotScript = document.createElement('script');
-        filerobotScript.setAttribute('src', 'https://scaleflex.cloudimg.io/v7/plugins/filerobot-widget/latest/filerobot-widget.min.js?vh=a7ea41&func=proxy');
+        filerobotScript.setAttribute('src', 'https://scaleflex.cloudimg.io/v7/plugins/filerobot-widget/2.9.5/filerobot-widget.min.js?vh=a7ea41&func=proxy');
         filerobotScript.setAttribute('async', 'true');
         document.head.appendChild(filerobotScript);
 
