@@ -4,3 +4,6 @@
 
 # 1.0.2
 - Upgrade Filerobot Widget to V3
+
+# 1.0.3
+- Update Filerobot Widget library
