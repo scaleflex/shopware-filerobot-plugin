@@ -7,3 +7,6 @@
 
 # 1.0.3
 - Aktualisieren Sie die Filerobot-Widget-Bibliothek
+
+# 1.0.4
+- Aktualisieren Sie die Filerobot-Widget-Bibliothek

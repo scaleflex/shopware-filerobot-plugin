@@ -71,7 +71,7 @@ Component.register('sw-filerobot-index', {
 
     mounted() {
         let filerobotScript = document.createElement('script');
-        filerobotScript.setAttribute('src', 'https://scaleflex.cloudimg.io/v7/plugins/filerobot-widget/2.9.5/filerobot-widget.min.js?vh=a7ea41&func=proxy');
+        filerobotScript.setAttribute('src', 'https://scaleflex.cloudimg.io/v7/plugins/filerobot-widget/stable/filerobot-widget.min.js?vh=83f1e3&func=proxy');
         filerobotScript.setAttribute('async', 'true');
         document.head.appendChild(filerobotScript);
 
@@ -173,19 +173,9 @@ Component.register('sw-filerobot-index', {
 
                 let filerobot = null;
 
-                // Locale
-                const locales = Filerobot.locales;
-                let defaultLocale = 'EN';
-                if (this.$tc('frWidgetLocale.locale') !== '') {
-                    defaultLocale = this.$tc('frWidgetLocale.locale');
-                }
-                locales[defaultLocale].strings.download = this.$tc('frWidgetLocale.button.export');
-
                 filerobot = Filerobot.Core({
                     securityTemplateID: this.frSEC,
                     container: this.frToken,
-                    locale: locales[defaultLocale],
-                    language: defaultLocale.toLowerCase()
                 });
 
                 // Plugins
@@ -205,11 +195,13 @@ Component.register('sw-filerobot-index', {
                         inline: true,
                         width: 10000,
                         height: 1000,
-                        disableExportButton: false,
-                        disableTopBarMainButton: true,
+                        disableExportButton: true,
                         hideExportButtonIcon: true,
                         preventExportDefaultBehavior: true,
                         dismissUrlPathQueryUpdate: true,
+                        disableDownloadButton: false,
+                        hideDownloadButtonIcon: true,
+                        preventDownloadDefaultBehavior: true,
                         resetAfterClose: true,
                     })
                     .use(ImageEditor)

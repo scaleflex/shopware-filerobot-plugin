@@ -104,7 +104,7 @@ Component.register('sw-filerobot-library', {
 
     mounted() {
         let filerobotScript = document.createElement('script');
-        filerobotScript.setAttribute('src', 'https://scaleflex.cloudimg.io/v7/plugins/filerobot-widget/2.9.5/filerobot-widget.min.js?vh=a7ea41&func=proxy');
+        filerobotScript.setAttribute('src', 'https://scaleflex.cloudimg.io/v7/plugins/filerobot-widget/stable/filerobot-widget.min.js?vh=83f1e3&func=proxy');
         filerobotScript.setAttribute('async', 'true');
         document.head.appendChild(filerobotScript);
 
@@ -235,18 +235,9 @@ Component.register('sw-filerobot-library', {
 
                 let filerobot = null;
 
-                // Locale
-                const locales = Filerobot.locales;
-                let defaultLocale = 'EN';
-                if (this.$tc('frWidgetLocale.locale') !== '') {
-                    defaultLocale = this.$tc('frWidgetLocale.locale');
-                }
-
                 filerobot = Filerobot.Core({
                     securityTemplateID: this.frSEC,
-                    container: this.frToken,
-                    locale: locales[defaultLocale],
-                    language: defaultLocale.toLowerCase()
+                    container: this.frToken
                 });
                 this.renderWidget(filerobot);
             } else {
@@ -350,8 +341,10 @@ Component.register('sw-filerobot-library', {
                     disableExportButton: false,
                     hideExportButtonIcon: true,
                     preventExportDefaultBehavior: true,
-                    resetAfterClose: true,
                     dismissUrlPathQueryUpdate: true,
+                    disableDownloadButton: false,
+                    hideDownloadButtonIcon: true,
+                    preventDownloadDefaultBehavior: true,
                     locale: {
                         strings: {
                             mutualizedExportButtonLabel: this.$tc('frWidgetLocale.button.export'),
@@ -436,7 +429,7 @@ Component.register('sw-filerobot-library', {
                                                  */
                                                 let checkUpload = false;
                                                 while (!checkUpload) {
-                                                    await this.sleep(1000);
+                                                    await this.sleep(1500);
                                                     media = await this.mediaRepository.get(media_id, Context.api);
                                                     if (media.uploadedAt !== null) {
                                                         //override image url in selection
