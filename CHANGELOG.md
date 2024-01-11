@@ -13,3 +13,6 @@
 
 # 1.0.5
 - Update Filerobot Widget library
+
+# 1.0.6
+- Update Filerobot Widget library
