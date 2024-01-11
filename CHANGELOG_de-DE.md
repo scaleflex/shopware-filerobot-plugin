@@ -10,3 +10,6 @@
 
 # 1.0.4
 - Aktualisieren Sie die Filerobot-Widget-Bibliothek
+
+# 1.0.5
+- Aktualisieren Sie die Filerobot-Widget-Bibliothek
