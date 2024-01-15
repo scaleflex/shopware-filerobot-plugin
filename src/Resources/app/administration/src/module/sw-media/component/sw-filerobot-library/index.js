@@ -429,13 +429,13 @@ Component.register('sw-filerobot-library', {
                                                  */
                                                 let checkUpload = false;
                                                 while (!checkUpload) {
-                                                    await this.sleep(1500);
+                                                    await this.sleep(1000);
                                                     media = await this.mediaRepository.get(media_id, Context.api);
                                                     if (media.uploadedAt !== null) {
                                                         //override image url in selection
                                                         this.selection[this.selection.length - 1].url = selected.file.url.cdn;
                                                         this.selectedItems = this.selection;
-
+                                                        
                                                         checkUpload = true;
                                                         let mediaURL = media.url;
                                                         let mediaPath = mediaURL.replace(domainUrl, '');
@@ -483,6 +483,7 @@ Component.register('sw-filerobot-library', {
                                 modalElement.querySelector('.sw-button.sw-button--primary').click();
                                 this.$emit('media-selection-change', this.selectedItems);
 
+                                await this.sleep(800);
                                 if (mediaArray.length) {
                                     for (let i = 0; i < mediaArray.length; i++) {
                                         let deleteURL = domainUrl + 'api/scaleflex/filerobot/clean-up-media';
