@@ -2,27 +2,19 @@
 
 namespace Scaleflex\Filerobot\Controller\Api;
 
-use Scaleflex\Filerobot\Service\FilesystemService;
-use Shopware\Core\Content\Media\MediaEntity;
-use Shopware\Core\Content\Media\Pathname\PathnameStrategy\FilenamePathnameStrategy;
-use Scaleflex\Filerobot\Extension\Content\Media\Pathname\UrlGeneratorExtension;
+use League\Flysystem\Filesystem;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Uuid\Uuid;
-use Shopware\Core\Kernel;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Shopware\Core\Framework\Api\Controller\ApiController;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 
 /**
- * @RouteScope(scopes={"api"})
+ * @Route(defaults={"_routeScope"={"api"}})
  */
 class CleanUpMediaForFileRobotController extends AbstractController
 {
@@ -43,13 +35,8 @@ class CleanUpMediaForFileRobotController extends AbstractController
      * */
     private $mediaFileData;
 
-    private $filesystemService;
-
-    public function __construct(
-        FilesystemService $filesystemService
-    )
+    public function __construct()
     {
-        $this->filesystemService = $filesystemService;
     }
 
     /**
@@ -140,8 +127,9 @@ class CleanUpMediaForFileRobotController extends AbstractController
     private function removeMediaFileFromLocalStep(): void
     {
         try {
-            if ($this->filesystemService->hasPublicFile($this->processedMedia['file_path'])) {
-                $this->filesystemService->removePublicFile($this->processedMedia['file_path']);
+            $filesystem = $this->container->get('shopware.filesystem.public');
+            if ($filesystem->has($this->processedMedia['file_path'])) {
+                $filesystem->delete($this->processedMedia['file_path']);
             }
         } catch (\Exception $exception) {
             throw new \Exception($exception->getMessage());

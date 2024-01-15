@@ -336,7 +336,7 @@ Component.register('sw-filerobot-library', {
                     },
                     target: '#filerobot-widget',
                     inline: true,
-                    width: 10000,
+                    width: "100%",
                     height: 1000,
                     disableExportButton: false,
                     hideExportButtonIcon: true,

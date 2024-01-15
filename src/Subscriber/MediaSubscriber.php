@@ -14,6 +14,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Shopware\Core\Content\Media\MediaEvents;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 
 class MediaSubscriber implements EventSubscriberInterface
 {
@@ -23,8 +24,8 @@ class MediaSubscriber implements EventSubscriberInterface
 
 
     public function __construct(
-        EntityRepositoryInterface $filerobotMediaRepository,
-        EntityRepositoryInterface $mediaThumbnailSizeRepository,
+        EntityRepository $filerobotMediaRepository,
+        EntityRepository $mediaThumbnailSizeRepository,
         SystemConfigService $systemConfigService
     )
     {

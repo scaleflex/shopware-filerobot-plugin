@@ -7,10 +7,6 @@
         <service id="Scaleflex\Filerobot\Component\DependencyInjection\CustomProfilerExtensions" />
         <service id="Scaleflex\Filerobot\Component\Profiler\TwigDecorator" />
 
-        <service id="scaleflex_filerobot_plugin.filesystem" class="Scaleflex\Filerobot\Service\FilesystemService">
-            <argument type="service" id="shopware.filesystem.public"/>
-        </service>
-
         <service id="Scaleflex\Filerobot\Subscriber\MediaSubscriber">
             <argument type="service" id="filerobot_media.repository"/>
             <argument type="service" id="media_thumbnail_size.repository"/>
@@ -29,7 +25,6 @@
         </service>
 
         <service id="Scaleflex\Filerobot\Controller\Api\CleanUpMediaForFileRobotController" public="true">
-            <argument type="service" id="scaleflex_filerobot_plugin.filesystem"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
