@@ -62,7 +62,7 @@ Component.register('sw-filerobot-index', {
                     securityTemplateID: frSEC,
                     container: frToken
                 });
-                this.renderWidget(filerobot);
+                this.renderWidget(filerobot, frConfig);
             } else {
                 this.createNotificationError({
                     title: this.$tc('global.default.error'),
@@ -87,7 +87,9 @@ Component.register('sw-filerobot-index', {
             });
         },
 
-        renderWidget(filerobot) {
+        renderWidget(filerobot, frConfig) {
+            let frUploadDirectory = frConfig['ScaleflexFilerobot.config.frUploadDirectory'];
+
             // Plugins
             let Explorer = Filerobot.Explorer;
             let XHRUpload = Filerobot.XHRUpload;
@@ -99,7 +101,7 @@ Component.register('sw-filerobot-index', {
             filerobot
                 .use(Explorer, {
                     config: {
-                        rootFolderPath: this.frUploadDirectory
+                        rootFolderPath: frUploadDirectory
                     },
                     target: '#filerobot-widget',
                     inline: true,

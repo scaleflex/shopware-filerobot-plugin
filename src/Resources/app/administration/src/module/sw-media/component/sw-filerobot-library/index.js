@@ -174,7 +174,7 @@ Component.register('sw-filerobot-library', {
                     securityTemplateID: frSEC,
                     container: frToken
                 });
-                this.renderWidget(filerobot);
+                this.renderWidget(filerobot, frConfig);
             } else {
                 this.createNotificationError({
                     title: this.$tc('global.default.error'),
@@ -254,8 +254,13 @@ Component.register('sw-filerobot-library', {
             });
         },
 
-        renderWidget(filerobot) {
-            let current_url = window.location.href;
+        renderWidget(filerobot, frConfig) {
+            let frCNAME = frConfig['ScaleflexFilerobot.config.frCNAME'];
+            let frUploadDirectory = frConfig['ScaleflexFilerobot.config.frUploadDirectory'];
+            let frAdminAccessKeyID = frConfig['ScaleflexFilerobot.config.frAdminAccessKeyID'];
+            let frAdminSecretAccessKey = frConfig['ScaleflexFilerobot.config.frAdminSecretAccessKey'];
+            let frFolderId = frConfig['ScaleflexFilerobot.config.frFolderId'];
+
             // Plugins
             let Explorer = Filerobot.Explorer;
             let XHRUpload = Filerobot.XHRUpload;
@@ -267,7 +272,7 @@ Component.register('sw-filerobot-library', {
             filerobot
                 .use(Explorer, {
                     config: {
-                        rootFolderPath: this.frUploadDirectory
+                        rootFolderPath: frUploadDirectory
                     },
                     target: '#filerobot-widget',
                     inline: true,
@@ -291,16 +296,6 @@ Component.register('sw-filerobot-library', {
                 .use(ImageEditor)
                 .on('export', async (files, popupExportSuccessMsgFn, downloadFilesPackagedFn, downloadFileFn) => {
                     // console.dir(files);
-                    const frConfig = await this.systemConfigApiService.getValues('ScaleflexFilerobot.config');
-                    let frActivation = frConfig['ScaleflexFilerobot.config.frActivation'];
-                    let frSEC = frConfig['ScaleflexFilerobot.config.frSEC'];
-                    let frToken = frConfig['ScaleflexFilerobot.config.frToken'];
-                    let frCNAME = frConfig['ScaleflexFilerobot.config.frCNAME'];
-                    let frUploadDirectory = frConfig['ScaleflexFilerobot.config.frUploadDirectory'];
-                    let frAdminAccessKeyID = frConfig['ScaleflexFilerobot.config.frAdminAccessKeyID'];
-                    let frAdminSecretAccessKey = frConfig['ScaleflexFilerobot.config.frAdminSecretAccessKey'];
-                    let frFolderId = frConfig['ScaleflexFilerobot.config.frFolderId'];
-
                     let currentUrl = window.location.href;
                     let domainUrl = currentUrl.split("admin#")[0];
                     let oauthURL = domainUrl + 'api/oauth/token';

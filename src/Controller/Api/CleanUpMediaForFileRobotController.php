@@ -158,8 +158,9 @@ class CleanUpMediaForFileRobotController extends AbstractController
      */
     private function getMediaFileFromRequest(string $mediaPath): string
     {
+        $removeParam = explode('?', $mediaPath);
+        $mediaPath = $removeParam[0];
         $mediaPathArray = explode('/', $mediaPath);
-
         return end($mediaPathArray);
     }
 }
