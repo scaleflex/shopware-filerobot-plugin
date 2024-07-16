@@ -19,4 +19,5 @@
 
 # 1.0.7
 - Update Filerobot Widget library
+- Fixed bug when open the widget
 - Tested up to v6.6.4.0

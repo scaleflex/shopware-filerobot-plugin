@@ -19,4 +19,5 @@
 
 # 1.0.7
 - Aktualisieren Sie die Filerobot-Widget-Bibliothek
+- Fehler beim Öffnen des Widgets behoben
 - Tested up to v6.6.4.0

@@ -8,57 +8,9 @@ Component.register('sw-filerobot-index', {
     inject: ['systemConfigApiService', 'repositoryFactory', 'mediaService'],
 
     props: {
-        frActivation: {
-            type: Boolean,
-            required: false,
-            default: false,
-        },
-
-        frToken: {
-            type: String,
-            required: false,
-            default: null,
-        },
-
-        frSEC: {
-            type: String,
-            required: false,
-            default: null,
-        },
-
-        frUploadDirectory: {
-            type: String,
-            required: false,
-            default: null,
-        },
-
-        frSass: {
-            type: String,
-            required: false,
-            default: null,
-        },
-
         selection: {
             type: Array,
             required: true,
-        },
-
-        frAdminAccessKeyID: {
-            type: String,
-            required: false,
-            default: null,
-        },
-
-        frAdminSecretAccessKey: {
-            type: String,
-            required: false,
-            default: null,
-        },
-
-        adminAuthToken: {
-            type: String,
-            required: false,
-            default: null,
         },
     },
 
@@ -71,7 +23,7 @@ Component.register('sw-filerobot-index', {
 
     mounted() {
         let filerobotScript = document.createElement('script');
-        filerobotScript.setAttribute('src', 'https://scaleflex.cloudimg.io/v7/plugins/filerobot-widget/v3/latest/filerobot-widget.min.js');
+        filerobotScript.setAttribute('src', 'https://cdn.scaleflex.com/plugins/filerobot-widget/v3/latest/filerobot-widget.min.js');
         filerobotScript.setAttribute('async', 'true');
         document.head.appendChild(filerobotScript);
 
@@ -91,81 +43,14 @@ Component.register('sw-filerobot-index', {
     },
 
     methods: {
-        async validToken() {
+        async createdComponent() {
             const frConfig = await this.systemConfigApiService.getValues('ScaleflexFilerobot.config');
             let frActivation = frConfig['ScaleflexFilerobot.config.frActivation'];
             let frSEC = frConfig['ScaleflexFilerobot.config.frSEC'];
             let frToken = frConfig['ScaleflexFilerobot.config.frToken'];
-            let frUploadDirectory = frConfig['ScaleflexFilerobot.config.frUploadDirectory'];
-            let frAdminAccessKeyID = frConfig['ScaleflexFilerobot.config.frAdminAccessKeyID'];
-            let frAdminSecretAccessKey = frConfig['ScaleflexFilerobot.config.frAdminSecretAccessKey'];
-            let frFolderId = frConfig['ScaleflexFilerobot.config.frFolderId'];
 
-            if (frActivation === true) {
-                if (frToken !== '' || frSEC !== '') {
-                    let sass = '';
-                    let apiGetSass = 'https://api.filerobot.com/' + frToken + '/key/' + frSEC;
-
-                    await fetch(apiGetSass, {
-                        method: 'GET',
-                        timeout: 30,
-                        headers: {
-                            'Content-Type': 'application/json; charset=utf-8',
-                        }
-                    }).then((response) => response.json())
-                        .then((data) => {
-                            if (data.status !== undefined && data.status !== 'error') {
-                                sass = data.key;
-                            }
-
-                            if (sass === '') {
-                                this.createNotificationError({
-                                    title: this.$tc('global.default.error'),
-                                    message: this.$tc('frErrors.failedToGetKey')
-                                });
-                                console.log(this.$tc('frErrors.failedToGetKey'));
-                            } else {
-                                this.frToken = frToken;
-                                this.frSass = sass;
-                                this.frUploadDirectory = frUploadDirectory;
-                                this.frActivation = frActivation;
-                                this.frSEC = frSEC;
-                                this.frAdminAccessKeyID = frAdminAccessKeyID;
-                                this.frAdminSecretAccessKey = frAdminSecretAccessKey;
-                                this.frFolderId = frFolderId;
-                            }
-                        })
-                        .catch((error) => {
-                            console.error('Error:', error);
-                        });
-
-                    if (sass !== '') {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                } else {
-                    this.createNotificationError({
-                        title: this.$tc('global.default.error'),
-                        message: this.$tc('frErrors.tokenOrSEC')
-                    });
-                    console.log(this.$tc('frErrors.tokenOrSEC'));
-                    return false;
-                }
-            } else {
-                this.createNotificationError({
-                    title: this.$tc('global.default.error'),
-                    message: this.$tc('frErrors.notActive')
-                });
-                console.log(this.$tc('frErrors.notActive'));
-                return false;
-            }
-        },
-
-        async createdComponent() {
-            if (await this.validToken()) {
+            if (frActivation === true && frToken !== '' && frSEC !== '') {
                 this.mediaService.addListener(this.uploadTag, this.handleMediaServiceUploadEvent);
-                let current_url = window.location.href;
 
                 //wait library loaded
                 await this.waitFilerobotLibrary();
@@ -174,50 +59,15 @@ Component.register('sw-filerobot-index', {
                 let filerobot = null;
 
                 filerobot = Filerobot.Core({
-                    securityTemplateID: this.frSEC,
-                    container: this.frToken,
+                    securityTemplateID: frSEC,
+                    container: frToken
                 });
-
-                // Plugins
-                var Explorer = Filerobot.Explorer;
-                var XHRUpload = Filerobot.XHRUpload;
-
-                // Optional plugins:
-                var ImageEditor = Filerobot.ImageEditor;
-                // var Webcam = Filerobot.Webcam;
-
-                filerobot
-                    .use(Explorer, {
-                        config: {
-                            rootFolderPath: this.frUploadDirectory
-                        },
-                        target: '#filerobot-widget',
-                        inline: true,
-                        width: 10000,
-                        height: 1000,
-                        disableExportButton: true,
-                        hideExportButtonIcon: true,
-                        preventExportDefaultBehavior: true,
-                        dismissUrlPathQueryUpdate: true,
-                        disableDownloadButton: false,
-                        hideDownloadButtonIcon: true,
-                        preventDownloadDefaultBehavior: true,
-                        resetAfterClose: true,
-                    })
-                    .use(ImageEditor)
-                    .use(XHRUpload)
-                    .on('export', async (files, popupExportSuccessMsgFn, downloadFilesPackagedFn, downloadFileFn) => {
-
-                    })
-                    .on('complete', ({failed, uploadID, successful}) => {
-
-                    });
+                this.renderWidget(filerobot);
             } else {
                 this.createNotificationError({
                     title: this.$tc('global.default.error'),
                     message: this.$tc('frErrors.unauthorized')
                 });
-                console.log(this.$tc('frErrors.unauthorized'));
             }
         },
 
@@ -235,6 +85,48 @@ Component.register('sw-filerobot-index', {
                     }
                 }
             });
+        },
+
+        renderWidget(filerobot) {
+            // Plugins
+            let Explorer = Filerobot.Explorer;
+            let XHRUpload = Filerobot.XHRUpload;
+
+            // Optional plugins:
+            let ImageEditor = Filerobot.ImageEditor;
+            // let Webcam = Filerobot.Webcam;
+
+            filerobot
+                .use(Explorer, {
+                    config: {
+                        rootFolderPath: this.frUploadDirectory
+                    },
+                    target: '#filerobot-widget',
+                    inline: true,
+                    width: "100%",
+                    height: 1000,
+                    disableExportButton: false,
+                    hideExportButtonIcon: true,
+                    preventExportDefaultBehavior: true,
+                    dismissUrlPathQueryUpdate: true,
+                    disableDownloadButton: false,
+                    hideDownloadButtonIcon: true,
+                    preventDownloadDefaultBehavior: true,
+                    locale: {
+                        strings: {
+                            mutualizedExportButtonLabel: this.$tc('frWidgetLocale.button.export'),
+                            mutualizedDownloadButton: this.$tc('frWidgetLocale.button.export')
+                        }
+                    },
+                })
+                .use(XHRUpload)
+                .use(ImageEditor)
+                .on('export', async (files, popupExportSuccessMsgFn, downloadFilesPackagedFn, downloadFileFn) => {
+
+                })
+                .on('complete', ({failed, uploadID, successful}) => {
+
+                });
         }
     },
 });

@@ -2,20 +2,15 @@
 
 namespace Scaleflex\Filerobot\Controller\Api;
 
-use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
-/**
- * @Route(defaults={"_routeScope"={"api"}})
- */
+#[Route(defaults: ['_routeScope' => ['api']])]
 class ApiTestController extends AbstractController
 {
-    /**
-     * @Route("/api/_action/filerobot-api-test/verify", name="api.action.scaleflex.filerobot.verify", methods={"POST"})
-     */
+    #[Route(path: '/api/_action/filerobot-api-test/verify', name: 'api.action.scaleflex.filerobot.verify', methods: ['POST'])]
     public function check(Request $request): JsonResponse
     {
         /**

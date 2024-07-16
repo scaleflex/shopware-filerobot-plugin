@@ -8,17 +8,12 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Shopware\Core\Framework\Routing\Annotation\RouteScope;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
-/**
- * @Route(defaults={"_routeScope"={"api"}})
- */
+#[Route(defaults: ['_routeScope' => ['api']])]
 class CheckFilerobotUuidExistApiController extends AbstractController
 {
-    /**
-     * @Route("/api/scaleflex/filerobot/check-filerobot-uuid-exist", name="api.action.scaleflex.filerobot.check-filerobot-uuid-exist", methods={"POST"})
-     */
+    #[Route(path: '/api/scaleflex/filerobot/check-filerobot-uuid-exist', name: 'api.action.scaleflex.filerobot.check-filerobot-uuid-exist', methods: ['POST'])]
     public function checkFilerobotUuidExist(Request $request, Context $context): JsonResponse
     {
         $filerobotUuid = $this->getFilerobotUuidFromRequest($request);

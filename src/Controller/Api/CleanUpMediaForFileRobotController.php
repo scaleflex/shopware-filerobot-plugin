@@ -2,20 +2,16 @@
 
 namespace Scaleflex\Filerobot\Controller\Api;
 
-use League\Flysystem\Filesystem;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 
-/**
- * @Route(defaults={"_routeScope"={"api"}})
- */
+#[Route(defaults: ['_routeScope' => ['api']])]
 class CleanUpMediaForFileRobotController extends AbstractController
 {
     /*
@@ -39,9 +35,7 @@ class CleanUpMediaForFileRobotController extends AbstractController
     {
     }
 
-    /**
-     * @Route("/api/scaleflex/filerobot/clean-up-media", name="api.action.scaleflex.filerobot.clean-up-media", methods={"POST"})
-     */
+    #[Route(path: '/api/scaleflex/filerobot/clean-up-media', name: 'api.action.scaleflex.filerobot.clean-up-media', methods: ['POST'])]
     public function cleanUpMedia(Request $request, Context $context): JsonResponse
     {
         $this->getRequiredParameters($request);
