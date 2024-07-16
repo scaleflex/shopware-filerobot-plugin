@@ -16,3 +16,7 @@
 
 # 1.0.6
 - Aktualisieren Sie die Filerobot-Widget-Bibliothek und beheben Sie den Fehler
+
+# 1.0.7
+- Aktualisieren Sie die Filerobot-Widget-Bibliothek
+- Tested up to v6.6.4.0

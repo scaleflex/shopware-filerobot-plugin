@@ -16,3 +16,7 @@
 
 # 1.0.6
 - Update Filerobot Widget library and fix bug
+
+# 1.0.7
+- Update Filerobot Widget library
+- Tested up to v6.6.4.0
