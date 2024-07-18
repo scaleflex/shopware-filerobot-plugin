@@ -3,7 +3,7 @@
   "keywords": ["scaleflex", "shopware-6", "filerobot", "cdn", "image optimization"],
   "description": "Filerobot by Scaleflex normalizes, resizes, optimizes and distributes your images rocket fast around the world.",
   "type": "shopware-platform-plugin",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "license": "proprietary",
   "autoload": {
     "psr-4": {
